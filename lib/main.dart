@@ -14,16 +14,16 @@ import 'views/app.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   // Initialize Hive
   await Hive.initFlutter();
-  
+
   // Register Hive adapters
   Hive.registerAdapter(MoodEntryAdapter());
   Hive.registerAdapter(HabitAdapter());
   Hive.registerAdapter(HabitEntryAdapter());
   Hive.registerAdapter(UserSettingsAdapter());
-  
+
   // Initialize Firebase (optional)
   try {
     await Firebase.initializeApp();
@@ -31,14 +31,14 @@ void main() async {
     // Firebase not configured, continue without it
     debugPrint('Firebase not initialized: $e');
   }
-  
+
   // Initialize services
   final moodService = MoodService();
   final habitService = HabitService();
-  
+
   await moodService.init();
   await habitService.init();
-  
+
   runApp(
     MultiBlocProvider(
       providers: [
