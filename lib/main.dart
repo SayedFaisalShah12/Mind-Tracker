@@ -11,6 +11,7 @@ import 'services/mood_service.dart';
 import 'services/habit_service.dart';
 import 'services/dummy_data_service.dart';
 import 'services/notification_service.dart';
+import 'services/theme_service.dart';
 import 'bloc/mood/mood_bloc.dart';
 import 'bloc/habit/habit_bloc.dart';
 import 'views/app.dart';
@@ -31,8 +32,9 @@ void main() async {
   final moodService = MoodService();
   final habitService = HabitService();
   
-  // Initialize notification service
+  // Initialize services
   await NotificationService.initialize();
+  await ThemeService.initialize();
 
   // Check if this is first launch
   final prefs = await SharedPreferences.getInstance();
@@ -77,20 +79,9 @@ class MindTrackerApp extends StatelessWidget {
       ],
       child: MaterialApp(
         title: 'Mind Tracker',
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(
-            seedColor: Colors.blue,
-            brightness: Brightness.light,
-          ),
-          useMaterial3: true,
-        ),
-        darkTheme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(
-            seedColor: Colors.blue,
-            brightness: Brightness.dark,
-          ),
-          useMaterial3: true,
-        ),
+        theme: ThemeService.getLightTheme(),
+        darkTheme: ThemeService.getDarkTheme(),
+        themeMode: ThemeService.themeMode,
         home: App(isFirstLaunch: isFirstLaunch),
         debugShowCheckedModeBanner: false,
       ),

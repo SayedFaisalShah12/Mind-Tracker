@@ -6,6 +6,7 @@ import '../bloc/habit/habit_bloc.dart';
 import '../bloc/habit/habit_event.dart';
 import '../services/notification_service.dart';
 import '../services/biometric_service.dart';
+import '../services/theme_service.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -24,13 +25,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   final List<String> _themeModes = ['light', 'dark', 'system'];
   final List<String> _reminderTimes = ['08:00', '12:00', '18:00', '20:00', '22:00'];
-  final List<Map<String, dynamic>> _colors = [
-    {'name': 'blue', 'color': Colors.blue},
-    {'name': 'green', 'color': Colors.green},
-    {'name': 'purple', 'color': Colors.purple},
-    {'name': 'orange', 'color': Colors.orange},
-    {'name': 'pink', 'color': Colors.pink},
-  ];
 
   @override
   void initState() {
@@ -51,6 +45,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
         _notificationsEnabled = reminderSettings['enabled'];
         _reminderTime = reminderSettings['time'];
         _biometricEnabled = biometricEnabled;
+        _themeMode = ThemeService.getCurrentThemeModeName();
+        _primaryColor = ThemeService.getCurrentColorName();
       });
     } catch (e) {
       print('Error loading settings: $e');
