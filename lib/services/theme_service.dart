@@ -44,6 +44,7 @@ class ThemeService {
       case 'dark':
         return ThemeMode.dark;
       case 'system':
+      default:
         return ThemeMode.system;
     }
   }

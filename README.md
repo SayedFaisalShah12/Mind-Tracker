@@ -48,6 +48,7 @@ A cross-platform Flutter app for tracking mood and habits, similar to Daylio Jou
 - **Notifications**: flutter_local_notifications
 - **Authentication**: local_auth (biometric)
 - **Cloud Sync**: Firebase (optional)
+- **Device Preview**: device_preview (development)
 
 ## Project Structure
 
@@ -91,8 +92,8 @@ dart run build_runner build
 
 4. Run the app:
 ```bash
-# For web
-flutter run -d chrome
+# For web (with device preview)
+flutter run -d chrome --web-port=8080
 
 # For Android
 flutter run
@@ -100,6 +101,32 @@ flutter run
 # For iOS
 flutter run
 ```
+
+## 📱 Device Preview
+
+The app includes **Device Preview** for easy testing across different devices:
+
+- **iPhone 13** (default)
+- **iPhone 13 Pro Max**
+- **Samsung Galaxy S21**
+- **Samsung Galaxy Note 20**
+- **iPad Pro**
+- **iPad Air**
+- **macOS Desktop**
+- **Windows Desktop**
+
+### Using Device Preview
+
+1. **Run with device preview enabled** (debug mode only):
+   ```bash
+   flutter run -d chrome --web-port=8080
+   ```
+
+2. **Switch between devices** using the device selector in the preview panel
+
+3. **Test different orientations** and screen sizes
+
+4. **Disable for production** by setting `DevicePreviewConfig.isEnabled = false`
 
 ## Usage
 

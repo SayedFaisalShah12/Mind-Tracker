@@ -46,6 +46,7 @@ dependencies:
   # UI Components
   flutter_svg: ^2.0.10+1
   cached_network_image: ^3.4.1
+  device_preview: ^1.1.0
 
 dev_dependencies:
   flutter_test:

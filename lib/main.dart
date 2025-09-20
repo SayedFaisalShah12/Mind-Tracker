@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:device_preview/device_preview.dart';
 
+import 'config/device_preview_config.dart';
 import 'models/mood_entry.dart';
 import 'models/habit.dart';
 import 'models/habit_entry.dart';
@@ -47,11 +49,16 @@ void main() async {
     await DummyDataService.addDummyData();
   }
 
+  // Enable device preview in debug mode
   runApp(
-    MindTrackerApp(
-      moodService: moodService,
-      habitService: habitService,
-      isFirstLaunch: isFirstLaunch,
+    DevicePreview(
+      enabled: DevicePreviewConfig.isEnabled,
+      builder:
+          (context) => MindTrackerApp(
+            moodService: moodService,
+            habitService: habitService,
+            isFirstLaunch: isFirstLaunch,
+          ),
     ),
   );
 }
@@ -86,6 +93,9 @@ class MindTrackerApp extends StatelessWidget {
         themeMode: ThemeService.themeMode,
         home: App(isFirstLaunch: isFirstLaunch),
         debugShowCheckedModeBanner: false,
+        // Device preview specific settings
+        locale: DevicePreview.locale(context),
+        builder: DevicePreview.appBuilder,
       ),
     );
   }
