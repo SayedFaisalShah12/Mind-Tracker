@@ -4,6 +4,7 @@ import '../bloc/mood/mood_bloc.dart';
 import '../bloc/mood/mood_event.dart';
 import '../bloc/habit/habit_bloc.dart';
 import '../bloc/habit/habit_event.dart';
+import '../services/notification_service.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -18,6 +19,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   String _themeMode = 'system';
   String _reminderTime = '20:00';
   String _primaryColor = 'blue';
+  bool _isLoading = false;
 
   final List<String> _themeModes = ['light', 'dark', 'system'];
   final List<String> _reminderTimes = ['08:00', '12:00', '18:00', '20:00', '22:00'];
@@ -28,6 +30,32 @@ class _SettingsScreenState extends State<SettingsScreen> {
     {'name': 'orange', 'color': Colors.orange},
     {'name': 'pink', 'color': Colors.pink},
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSettings();
+  }
+
+  Future<void> _loadSettings() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final reminderSettings = await NotificationService.getReminderSettings();
+      setState(() {
+        _notificationsEnabled = reminderSettings['enabled'];
+        _reminderTime = reminderSettings['time'];
+      });
+    } catch (e) {
+      print('Error loading settings: $e');
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -189,10 +217,33 @@ class _SettingsScreenState extends State<SettingsScreen> {
               title: const Text('Enable Notifications'),
               subtitle: const Text('Get reminders to log your mood'),
               value: _notificationsEnabled,
-              onChanged: (value) {
+              onChanged: _isLoading ? null : (value) async {
                 setState(() {
                   _notificationsEnabled = value;
                 });
+                
+                // Request permissions if enabling
+                if (value) {
+                  final hasPermission = await NotificationService.requestPermissions();
+                  if (!hasPermission) {
+                    setState(() {
+                      _notificationsEnabled = false;
+                    });
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Notification permission denied'),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                    return;
+                  }
+                }
+                
+                // Update notification settings
+                await NotificationService.updateReminderSettings(
+                  enabled: _notificationsEnabled,
+                  time: _reminderTime,
+                );
               },
             ),
             if (_notificationsEnabled) ...[
@@ -231,10 +282,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
               child: Text(time),
             );
           }).toList(),
-          onChanged: (value) {
+          onChanged: _isLoading ? null : (value) async {
             setState(() {
               _reminderTime = value!;
             });
+            
+            // Update notification settings
+            await NotificationService.updateReminderSettings(
+              enabled: _notificationsEnabled,
+              time: _reminderTime,
+            );
           },
         ),
       ],
