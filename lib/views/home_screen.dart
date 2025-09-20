@@ -6,6 +6,7 @@ import '../bloc/mood/mood_state.dart';
 import '../bloc/habit/habit_bloc.dart';
 import '../bloc/habit/habit_event.dart';
 import '../bloc/habit/habit_state.dart';
+import '../services/notification_service.dart';
 import 'mood_tracking_screen.dart';
 import 'habits_screen.dart';
 import 'statistics_screen.dart';
@@ -41,6 +42,19 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: IndexedStack(index: _currentIndex, children: _screens),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () async {
+          await NotificationService.showInstantMoodReminder();
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Mood reminder sent!'),
+              backgroundColor: Colors.green,
+            ),
+          );
+        },
+        tooltip: 'Send Mood Reminder',
+        child: const Icon(Icons.notifications_active),
+      ),
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         currentIndex: _currentIndex,

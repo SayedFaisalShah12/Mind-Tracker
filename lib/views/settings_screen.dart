@@ -5,6 +5,7 @@ import '../bloc/mood/mood_event.dart';
 import '../bloc/habit/habit_bloc.dart';
 import '../bloc/habit/habit_event.dart';
 import '../services/notification_service.dart';
+import '../services/biometric_service.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -44,9 +45,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
     try {
       final reminderSettings = await NotificationService.getReminderSettings();
+      final biometricEnabled = await BiometricService.isEnabled();
+      
       setState(() {
         _notificationsEnabled = reminderSettings['enabled'];
         _reminderTime = reminderSettings['time'];
+        _biometricEnabled = biometricEnabled;
       });
     } catch (e) {
       print('Error loading settings: $e');
@@ -316,10 +320,57 @@ class _SettingsScreenState extends State<SettingsScreen> {
               title: const Text('Biometric Lock'),
               subtitle: const Text('Use fingerprint or face ID to secure the app'),
               value: _biometricEnabled,
-              onChanged: (value) {
-                setState(() {
-                  _biometricEnabled = value;
-                });
+              onChanged: _isLoading ? null : (value) async {
+                if (value) {
+                  // Check if biometric is available
+                  final isAvailable = await BiometricService.isAvailable();
+                  if (!isAvailable) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Biometric authentication is not available on this device'),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                    return;
+                  }
+
+                  // Test authentication
+                  final biometricType = await BiometricService.getBiometricTypeString();
+                  final success = await BiometricService.authenticate(
+                    reason: 'Enable biometric lock for Mind Tracker',
+                  );
+
+                  if (success) {
+                    setState(() {
+                      _biometricEnabled = true;
+                    });
+                    await BiometricService.setEnabled(true);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Biometric lock enabled with $biometricType'),
+                        backgroundColor: Colors.green,
+                      ),
+                    );
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Authentication failed. Biometric lock not enabled.'),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                  }
+                } else {
+                  setState(() {
+                    _biometricEnabled = false;
+                  });
+                  await BiometricService.setEnabled(false);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Biometric lock disabled'),
+                      backgroundColor: Colors.orange,
+                    ),
+                  );
+                }
               },
             ),
           ],
