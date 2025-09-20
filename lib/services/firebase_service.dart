@@ -10,17 +10,17 @@ import '../models/user_settings.dart';
 class FirebaseService {
   static FirebaseAuth get _auth => FirebaseAuth.instance;
   static FirebaseFirestore get _firestore => FirebaseFirestore.instance;
-  
+
   static bool _initialized = false;
   static User? _currentUser;
 
   static Future<void> initialize() async {
     if (_initialized) return;
-    
+
     try {
       await Firebase.initializeApp();
       _initialized = true;
-      
+
       // Listen to auth state changes
       _auth.authStateChanges().listen((User? user) {
         _currentUser = user;
@@ -44,7 +44,7 @@ class FirebaseService {
         email: email,
         password: password,
       );
-      
+
       if (credential.user != null) {
         await _saveUserPreference('email', email);
         return AuthResult.success;
@@ -66,7 +66,7 @@ class FirebaseService {
         email: email,
         password: password,
       );
-      
+
       if (credential.user != null) {
         await _saveUserPreference('email', email);
         return AuthResult.success;
@@ -97,23 +97,25 @@ class FirebaseService {
   }
 
   // Data sync methods
-  static Future<SyncResult> syncMoodEntries(List<MoodEntry> localEntries) async {
+  static Future<SyncResult> syncMoodEntries(
+    List<MoodEntry> localEntries,
+  ) async {
     if (!isSignedIn) return SyncResult.notSignedIn;
-    
+
     try {
       final userId = _currentUser!.uid;
       final batch = _firestore.batch();
-      
+
       for (final entry in localEntries) {
         final docRef = _firestore
             .collection('users')
             .doc(userId)
             .collection('mood_entries')
             .doc(entry.id);
-        
+
         batch.set(docRef, entry.toJson());
       }
-      
+
       await batch.commit();
       return SyncResult.success;
     } catch (e) {
@@ -124,21 +126,21 @@ class FirebaseService {
 
   static Future<SyncResult> syncHabits(List<Habit> localHabits) async {
     if (!isSignedIn) return SyncResult.notSignedIn;
-    
+
     try {
       final userId = _currentUser!.uid;
       final batch = _firestore.batch();
-      
+
       for (final habit in localHabits) {
         final docRef = _firestore
             .collection('users')
             .doc(userId)
             .collection('habits')
             .doc(habit.id);
-        
+
         batch.set(docRef, habit.toJson());
       }
-      
+
       await batch.commit();
       return SyncResult.success;
     } catch (e) {
@@ -147,23 +149,25 @@ class FirebaseService {
     }
   }
 
-  static Future<SyncResult> syncHabitEntries(List<HabitEntry> localEntries) async {
+  static Future<SyncResult> syncHabitEntries(
+    List<HabitEntry> localEntries,
+  ) async {
     if (!isSignedIn) return SyncResult.notSignedIn;
-    
+
     try {
       final userId = _currentUser!.uid;
       final batch = _firestore.batch();
-      
+
       for (final entry in localEntries) {
         final docRef = _firestore
             .collection('users')
             .doc(userId)
             .collection('habit_entries')
             .doc(entry.id);
-        
+
         batch.set(docRef, entry.toJson());
       }
-      
+
       await batch.commit();
       return SyncResult.success;
     } catch (e) {
@@ -174,7 +178,7 @@ class FirebaseService {
 
   static Future<SyncResult> syncUserSettings(UserSettings settings) async {
     if (!isSignedIn) return SyncResult.notSignedIn;
-    
+
     try {
       final userId = _currentUser!.uid;
       await _firestore
@@ -183,7 +187,7 @@ class FirebaseService {
           .collection('settings')
           .doc('user_settings')
           .set(settings.toJson());
-      
+
       return SyncResult.success;
     } catch (e) {
       print('User settings sync error: $e');
@@ -194,15 +198,16 @@ class FirebaseService {
   // Download methods
   static Future<List<MoodEntry>> downloadMoodEntries() async {
     if (!isSignedIn) return [];
-    
+
     try {
       final userId = _currentUser!.uid;
-      final snapshot = await _firestore
-          .collection('users')
-          .doc(userId)
-          .collection('mood_entries')
-          .get();
-      
+      final snapshot =
+          await _firestore
+              .collection('users')
+              .doc(userId)
+              .collection('mood_entries')
+              .get();
+
       return snapshot.docs
           .map((doc) => MoodEntry.fromJson(doc.data()))
           .toList();
@@ -214,18 +219,17 @@ class FirebaseService {
 
   static Future<List<Habit>> downloadHabits() async {
     if (!isSignedIn) return [];
-    
+
     try {
       final userId = _currentUser!.uid;
-      final snapshot = await _firestore
-          .collection('users')
-          .doc(userId)
-          .collection('habits')
-          .get();
-      
-      return snapshot.docs
-          .map((doc) => Habit.fromJson(doc.data()))
-          .toList();
+      final snapshot =
+          await _firestore
+              .collection('users')
+              .doc(userId)
+              .collection('habits')
+              .get();
+
+      return snapshot.docs.map((doc) => Habit.fromJson(doc.data())).toList();
     } catch (e) {
       print('Download habits error: $e');
       return [];
@@ -234,15 +238,16 @@ class FirebaseService {
 
   static Future<List<HabitEntry>> downloadHabitEntries() async {
     if (!isSignedIn) return [];
-    
+
     try {
       final userId = _currentUser!.uid;
-      final snapshot = await _firestore
-          .collection('users')
-          .doc(userId)
-          .collection('habit_entries')
-          .get();
-      
+      final snapshot =
+          await _firestore
+              .collection('users')
+              .doc(userId)
+              .collection('habit_entries')
+              .get();
+
       return snapshot.docs
           .map((doc) => HabitEntry.fromJson(doc.data()))
           .toList();
@@ -254,16 +259,17 @@ class FirebaseService {
 
   static Future<UserSettings?> downloadUserSettings() async {
     if (!isSignedIn) return null;
-    
+
     try {
       final userId = _currentUser!.uid;
-      final doc = await _firestore
-          .collection('users')
-          .doc(userId)
-          .collection('settings')
-          .doc('user_settings')
-          .get();
-      
+      final doc =
+          await _firestore
+              .collection('users')
+              .doc(userId)
+              .collection('settings')
+              .doc('user_settings')
+              .get();
+
       if (doc.exists) {
         return UserSettings.fromJson(doc.data()!);
       }
@@ -297,26 +303,32 @@ class FirebaseService {
 
   static Future<void> deleteAllUserData() async {
     if (!isSignedIn) return;
-    
+
     try {
       final userId = _currentUser!.uid;
       final batch = _firestore.batch();
-      
+
       // Delete all user collections
-      final collections = ['mood_entries', 'habits', 'habit_entries', 'settings'];
-      
+      final collections = [
+        'mood_entries',
+        'habits',
+        'habit_entries',
+        'settings',
+      ];
+
       for (final collection in collections) {
-        final snapshot = await _firestore
-            .collection('users')
-            .doc(userId)
-            .collection(collection)
-            .get();
-        
+        final snapshot =
+            await _firestore
+                .collection('users')
+                .doc(userId)
+                .collection(collection)
+                .get();
+
         for (final doc in snapshot.docs) {
           batch.delete(doc.reference);
         }
       }
-      
+
       await batch.commit();
     } catch (e) {
       print('Delete user data error: $e');
@@ -324,13 +336,6 @@ class FirebaseService {
   }
 }
 
-enum AuthResult {
-  success,
-  failure,
-}
+enum AuthResult { success, failure }
 
-enum SyncResult {
-  success,
-  failure,
-  notSignedIn,
-}
+enum SyncResult { success, failure, notSignedIn }

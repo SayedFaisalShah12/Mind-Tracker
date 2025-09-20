@@ -27,11 +27,11 @@ class ThemeService {
 
   static Future<void> initialize() async {
     final prefs = await SharedPreferences.getInstance();
-    
+
     // Load theme mode
     final themeModeString = prefs.getString(_themeModeKey) ?? 'system';
     _themeMode = _parseThemeMode(themeModeString);
-    
+
     // Load primary color
     final colorName = prefs.getString(_primaryColorKey) ?? 'blue';
     _primaryColor = _availableColors[colorName] ?? Colors.blue;
@@ -44,7 +44,6 @@ class ThemeService {
       case 'dark':
         return ThemeMode.dark;
       case 'system':
-      default:
         return ThemeMode.system;
     }
   }
@@ -90,9 +89,7 @@ class ThemeService {
       ),
       cardTheme: CardTheme(
         elevation: 2,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
@@ -102,9 +99,7 @@ class ThemeService {
         ),
       ),
       inputDecorationTheme: InputDecorationTheme(
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
         filled: true,
         fillColor: Colors.grey[50],
       ),
@@ -125,9 +120,7 @@ class ThemeService {
       ),
       cardTheme: CardTheme(
         elevation: 2,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
@@ -137,9 +130,7 @@ class ThemeService {
         ),
       ),
       inputDecorationTheme: InputDecorationTheme(
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
         filled: true,
         fillColor: Colors.grey[800],
       ),

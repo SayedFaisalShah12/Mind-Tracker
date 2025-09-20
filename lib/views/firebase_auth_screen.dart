@@ -13,7 +13,7 @@ class _FirebaseAuthScreenState extends State<FirebaseAuthScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
-  
+
   bool _isSignUp = false;
   bool _isLoading = false;
   bool _obscurePassword = true;
@@ -42,14 +42,16 @@ class _FirebaseAuthScreenState extends State<FirebaseAuthScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const SizedBox(height: 32),
-              
+
               // Logo/Icon
               Center(
                 child: Container(
                   width: 100,
                   height: 100,
                   decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.primary.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(50),
                   ),
                   child: Icon(
@@ -60,7 +62,7 @@ class _FirebaseAuthScreenState extends State<FirebaseAuthScreen> {
                 ),
               ),
               const SizedBox(height: 32),
-              
+
               // Title
               Text(
                 _isSignUp ? 'Create Account' : 'Sign In to Sync',
@@ -70,18 +72,18 @@ class _FirebaseAuthScreenState extends State<FirebaseAuthScreen> {
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 8),
-              
+
               Text(
-                _isSignUp 
+                _isSignUp
                     ? 'Create an account to sync your data across devices'
                     : 'Sign in to sync your mood and habit data',
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Colors.grey[600],
-                ),
+                style: Theme.of(
+                  context,
+                ).textTheme.bodyMedium?.copyWith(color: Colors.grey[600]),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 32),
-              
+
               // Email field
               TextFormField(
                 controller: _emailController,
@@ -101,7 +103,7 @@ class _FirebaseAuthScreenState extends State<FirebaseAuthScreen> {
                 },
               ),
               const SizedBox(height: 16),
-              
+
               // Password field
               TextFormField(
                 controller: _passwordController,
@@ -111,7 +113,9 @@ class _FirebaseAuthScreenState extends State<FirebaseAuthScreen> {
                   prefixIcon: const Icon(Icons.lock),
                   suffixIcon: IconButton(
                     icon: Icon(
-                      _obscurePassword ? Icons.visibility : Icons.visibility_off,
+                      _obscurePassword
+                          ? Icons.visibility
+                          : Icons.visibility_off,
                     ),
                     onPressed: () {
                       setState(() {
@@ -131,7 +135,7 @@ class _FirebaseAuthScreenState extends State<FirebaseAuthScreen> {
                 },
               ),
               const SizedBox(height: 16),
-              
+
               // Confirm password field (only for sign up)
               if (_isSignUp) ...[
                 TextFormField(
@@ -142,7 +146,9 @@ class _FirebaseAuthScreenState extends State<FirebaseAuthScreen> {
                     prefixIcon: const Icon(Icons.lock),
                     suffixIcon: IconButton(
                       icon: Icon(
-                        _obscureConfirmPassword ? Icons.visibility : Icons.visibility_off,
+                        _obscureConfirmPassword
+                            ? Icons.visibility
+                            : Icons.visibility_off,
                       ),
                       onPressed: () {
                         setState(() {
@@ -163,56 +169,60 @@ class _FirebaseAuthScreenState extends State<FirebaseAuthScreen> {
                 ),
                 const SizedBox(height: 16),
               ],
-              
+
               // Submit button
               ElevatedButton(
                 onPressed: _isLoading ? null : _handleSubmit,
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
                 ),
-                child: _isLoading
-                    ? const CircularProgressIndicator()
-                    : Text(_isSignUp ? 'Sign Up' : 'Sign In'),
+                child:
+                    _isLoading
+                        ? const CircularProgressIndicator()
+                        : Text(_isSignUp ? 'Sign Up' : 'Sign In'),
               ),
               const SizedBox(height: 16),
-              
+
               // Toggle between sign in and sign up
               TextButton(
-                onPressed: _isLoading ? null : () {
-                  setState(() {
-                    _isSignUp = !_isSignUp;
-                    _passwordController.clear();
-                    _confirmPasswordController.clear();
-                  });
-                },
+                onPressed:
+                    _isLoading
+                        ? null
+                        : () {
+                          setState(() {
+                            _isSignUp = !_isSignUp;
+                            _passwordController.clear();
+                            _confirmPasswordController.clear();
+                          });
+                        },
                 child: Text(
-                  _isSignUp 
+                  _isSignUp
                       ? 'Already have an account? Sign In'
                       : 'Don\'t have an account? Sign Up',
                 ),
               ),
               const SizedBox(height: 16),
-              
+
               // Forgot password
               if (!_isSignUp)
                 TextButton(
                   onPressed: _isLoading ? null : _handleForgotPassword,
                   child: const Text('Forgot Password?'),
                 ),
-              
+
               const SizedBox(height: 32),
-              
+
               // Skip button
               TextButton(
-                onPressed: _isLoading ? null : () {
-                  Navigator.of(context).pop();
-                },
+                onPressed:
+                    _isLoading
+                        ? null
+                        : () {
+                          Navigator.of(context).pop();
+                        },
                 child: Text(
                   'Skip - Use Local Storage Only',
-                  style: TextStyle(
-                    color: Colors.grey[600],
-                    fontSize: 14,
-                  ),
+                  style: TextStyle(color: Colors.grey[600], fontSize: 14),
                 ),
               ),
             ],
@@ -231,7 +241,7 @@ class _FirebaseAuthScreenState extends State<FirebaseAuthScreen> {
 
     try {
       AuthResult result;
-      
+
       if (_isSignUp) {
         result = await FirebaseService.createUserWithEmailAndPassword(
           email: _emailController.text.trim(),
@@ -246,13 +256,13 @@ class _FirebaseAuthScreenState extends State<FirebaseAuthScreen> {
 
       if (result == AuthResult.success) {
         await FirebaseService.setCloudSyncEnabled(true);
-        
+
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                _isSignUp 
-                    ? 'Account created successfully!' 
+                _isSignUp
+                    ? 'Account created successfully!'
                     : 'Signed in successfully!',
               ),
               backgroundColor: Colors.green,
@@ -265,8 +275,8 @@ class _FirebaseAuthScreenState extends State<FirebaseAuthScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                _isSignUp 
-                    ? 'Failed to create account. Please try again.' 
+                _isSignUp
+                    ? 'Failed to create account. Please try again.'
                     : 'Failed to sign in. Please check your credentials.',
               ),
               backgroundColor: Colors.red,
@@ -277,10 +287,7 @@ class _FirebaseAuthScreenState extends State<FirebaseAuthScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error: $e'),
-            backgroundColor: Colors.red,
-          ),
+          SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
         );
       }
     } finally {
@@ -305,7 +312,7 @@ class _FirebaseAuthScreenState extends State<FirebaseAuthScreen> {
 
     try {
       await FirebaseService.resetPassword(_emailController.text.trim());
-      
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(

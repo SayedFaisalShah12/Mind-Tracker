@@ -12,6 +12,7 @@ import 'services/habit_service.dart';
 import 'services/dummy_data_service.dart';
 import 'services/notification_service.dart';
 import 'services/theme_service.dart';
+import 'services/firebase_service.dart';
 import 'bloc/mood/mood_bloc.dart';
 import 'bloc/habit/habit_bloc.dart';
 import 'views/app.dart';
@@ -35,6 +36,7 @@ void main() async {
   // Initialize services
   await NotificationService.initialize();
   await ThemeService.initialize();
+  await FirebaseService.initialize();
 
   // Check if this is first launch
   final prefs = await SharedPreferences.getInstance();
