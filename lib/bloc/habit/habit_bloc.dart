@@ -1,5 +1,4 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:equatable/equatable.dart';
 import 'habit_event.dart';
 import 'habit_state.dart';
 import '../../services/habit_service.dart';

@@ -1,5 +1,4 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:equatable/equatable.dart';
 import 'mood_event.dart';
 import 'mood_state.dart';
 import '../../services/mood_service.dart';

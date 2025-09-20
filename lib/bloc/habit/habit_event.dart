@@ -1,6 +1,5 @@
 import 'package:equatable/equatable.dart';
 import '../../models/habit.dart';
-import '../../models/habit_entry.dart';
 
 abstract class HabitEvent extends Equatable {
   const HabitEvent();

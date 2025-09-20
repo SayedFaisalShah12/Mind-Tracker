@@ -147,7 +147,7 @@ class _HabitsScreenState extends State<HabitsScreen> {
 
   Widget _buildTodayOverview(BuildContext context, HabitLoaded state) {
     final completedCount = state.todayHabitEntries.values
-        .where((entry) => entry.completed)
+        .where((entry) => entry.completed == true)
         .length;
     final totalCount = state.habits.length;
     

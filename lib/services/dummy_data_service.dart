@@ -1,7 +1,6 @@
 import '../models/mood_entry.dart';
 import '../models/habit.dart';
 import '../models/habit_entry.dart';
-import '../models/user_settings.dart';
 import 'mood_service.dart';
 import 'habit_service.dart';
 
@@ -169,7 +168,7 @@ class DummyDataService {
     
     final numTags = (random % 3) + 1; // 1-3 tags
     final shuffledTags = List.from(allTags)..shuffle();
-    return shuffledTags.take(numTags).toList();
+    return shuffledTags.take(numTags).toList().cast<String>();
   }
 
   static bool _getRandomBool() {

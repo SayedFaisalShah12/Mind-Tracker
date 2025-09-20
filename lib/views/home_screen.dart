@@ -292,7 +292,7 @@ class HomeTab extends StatelessWidget {
           builder: (context, state) {
             if (state is HabitLoaded) {
               final completedHabits = state.todayHabitEntries.values
-                  .where((entry) => entry.completed)
+                  .where((entry) => entry.completed == true)
                   .length;
               final totalHabits = state.habits.length;
               
@@ -380,7 +380,7 @@ class HomeTab extends StatelessWidget {
                 child: Padding(
                   padding: const EdgeInsets.all(16),
                   child: Column(
-                    children: recentMoods.map((mood) {
+                    children: recentMoods.map<Widget>((mood) {
                       return ListTile(
                         leading: Text(
                           mood.emoji,
