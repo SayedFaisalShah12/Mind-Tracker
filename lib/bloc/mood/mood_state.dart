@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import '../models/mood_entry.dart';
+import '../../models/mood_entry.dart';
 
 abstract class MoodState extends Equatable {
   const MoodState();
