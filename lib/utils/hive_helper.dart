@@ -9,7 +9,7 @@ class HiveHelper {
 
     final appDocumentDir = await getApplicationDocumentsDirectory();
     Hive.init(appDocumentDir.path);
-    
+
     _initialized = true;
   }
 

@@ -31,9 +31,7 @@ class _HabitsScreenState extends State<HabitsScreen> {
             icon: const Icon(Icons.add),
             onPressed: () {
               Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => const AddHabitScreen(),
-                ),
+                MaterialPageRoute(builder: (context) => const AddHabitScreen()),
               );
             },
           ),
@@ -69,10 +67,10 @@ class _HabitsScreenState extends State<HabitsScreen> {
             if (state.habits.isEmpty) {
               return _buildEmptyState(context);
             }
-            
+
             return _buildHabitsList(context, state);
           }
-          
+
           return const Center(child: Text('Unknown state'));
         },
       ),
@@ -86,11 +84,7 @@ class _HabitsScreenState extends State<HabitsScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.check_circle_outline,
-              size: 80,
-              color: Colors.grey[400],
-            ),
+            Icon(Icons.check_circle_outline, size: 80, color: Colors.grey[400]),
             const SizedBox(height: 24),
             Text(
               'No Habits Yet',
@@ -102,9 +96,9 @@ class _HabitsScreenState extends State<HabitsScreen> {
             const SizedBox(height: 12),
             Text(
               'Start building healthy habits by adding your first one!',
-              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                color: Colors.grey[500],
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.bodyLarge?.copyWith(color: Colors.grey[500]),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 32),
@@ -136,7 +130,7 @@ class _HabitsScreenState extends State<HabitsScreen> {
             itemBuilder: (context, index) {
               final habit = state.habits[index];
               final todayEntry = state.todayHabitEntries[habit.id];
-              
+
               return _buildHabitCard(context, habit, todayEntry);
             },
           ),
@@ -146,11 +140,12 @@ class _HabitsScreenState extends State<HabitsScreen> {
   }
 
   Widget _buildTodayOverview(BuildContext context, HabitLoaded state) {
-    final completedCount = state.todayHabitEntries.values
-        .where((entry) => entry.completed == true)
-        .length;
+    final completedCount =
+        state.todayHabitEntries.values
+            .where((entry) => entry.completed == true)
+            .length;
     final totalCount = state.habits.length;
-    
+
     return Card(
       margin: const EdgeInsets.all(16),
       child: Padding(
@@ -170,9 +165,9 @@ class _HabitsScreenState extends State<HabitsScreen> {
                   const SizedBox(height: 8),
                   Text(
                     '$completedCount of $totalCount habits completed',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Colors.grey[600],
-                    ),
+                    style: Theme.of(
+                      context,
+                    ).textTheme.bodyMedium?.copyWith(color: Colors.grey[600]),
                   ),
                 ],
               ),
@@ -188,9 +183,13 @@ class _HabitsScreenState extends State<HabitsScreen> {
     );
   }
 
-  Widget _buildHabitCard(BuildContext context, Habit habit, dynamic todayEntry) {
+  Widget _buildHabitCard(
+    BuildContext context,
+    Habit habit,
+    dynamic todayEntry,
+  ) {
     final isCompleted = todayEntry?.completed ?? false;
-    
+
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       child: ListTile(
@@ -202,10 +201,7 @@ class _HabitsScreenState extends State<HabitsScreen> {
             borderRadius: BorderRadius.circular(25),
           ),
           child: Center(
-            child: Text(
-              habit.emoji,
-              style: const TextStyle(fontSize: 24),
-            ),
+            child: Text(habit.emoji, style: const TextStyle(fontSize: 24)),
           ),
         ),
         title: Text(

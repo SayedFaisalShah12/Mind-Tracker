@@ -40,10 +40,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: IndexedStack(
-        index: _currentIndex,
-        children: _screens,
-      ),
+      body: IndexedStack(index: _currentIndex, children: _screens),
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         currentIndex: _currentIndex,
@@ -53,22 +50,13 @@ class _HomeScreenState extends State<HomeScreen> {
           });
         },
         items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.mood),
-            label: 'Mood',
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+          BottomNavigationBarItem(icon: Icon(Icons.mood), label: 'Mood'),
           BottomNavigationBarItem(
             icon: Icon(Icons.check_circle),
             label: 'Habits',
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.analytics),
-            label: 'Stats',
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.analytics), label: 'Stats'),
           BottomNavigationBarItem(
             icon: Icon(Icons.settings),
             label: 'Settings',
@@ -110,7 +98,7 @@ class HomeTab extends StatelessWidget {
   Widget _buildWelcomeCard(BuildContext context) {
     final now = DateTime.now();
     final greeting = _getGreeting(now.hour);
-    
+
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(20),
@@ -119,16 +107,16 @@ class HomeTab extends StatelessWidget {
           children: [
             Text(
               greeting,
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
             Text(
               'How are you feeling today?',
-              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                color: Colors.grey[600],
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.bodyLarge?.copyWith(color: Colors.grey[600]),
             ),
             const SizedBox(height: 16),
             BlocBuilder<MoodBloc, MoodState>(
@@ -174,9 +162,9 @@ class HomeTab extends StatelessWidget {
       children: [
         Text(
           'Quick Actions',
-          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-            fontWeight: FontWeight.bold,
-          ),
+          style: Theme.of(
+            context,
+          ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 16),
         Row(
@@ -202,9 +190,7 @@ class HomeTab extends StatelessWidget {
                 Icons.check_circle,
                 Colors.green,
                 () => Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => const HabitsScreen(),
-                  ),
+                  MaterialPageRoute(builder: (context) => const HabitsScreen()),
                 ),
               ),
             ),
@@ -265,9 +251,9 @@ class HomeTab extends StatelessWidget {
               const SizedBox(height: 8),
               Text(
                 title,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  fontWeight: FontWeight.w500,
-                ),
+                style: Theme.of(
+                  context,
+                ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w500),
                 textAlign: TextAlign.center,
               ),
             ],
@@ -283,19 +269,20 @@ class HomeTab extends StatelessWidget {
       children: [
         Text(
           'Today\'s Overview',
-          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-            fontWeight: FontWeight.bold,
-          ),
+          style: Theme.of(
+            context,
+          ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 16),
         BlocBuilder<HabitBloc, HabitState>(
           builder: (context, state) {
             if (state is HabitLoaded) {
-              final completedHabits = state.todayHabitEntries.values
-                  .where((entry) => entry.completed == true)
-                  .length;
+              final completedHabits =
+                  state.todayHabitEntries.values
+                      .where((entry) => entry.completed == true)
+                      .length;
               final totalHabits = state.habits.length;
-              
+
               return Card(
                 child: Padding(
                   padding: const EdgeInsets.all(16),
@@ -306,7 +293,9 @@ class HomeTab extends StatelessWidget {
                           children: [
                             Text(
                               '$completedHabits/$totalHabits',
-                              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                              style: Theme.of(
+                                context,
+                              ).textTheme.headlineMedium?.copyWith(
                                 fontWeight: FontWeight.bold,
                                 color: Colors.green,
                               ),
@@ -322,9 +311,14 @@ class HomeTab extends StatelessWidget {
                         child: Column(
                           children: [
                             CircularProgressIndicator(
-                              value: totalHabits > 0 ? completedHabits / totalHabits : 0,
+                              value:
+                                  totalHabits > 0
+                                      ? completedHabits / totalHabits
+                                      : 0,
                               backgroundColor: Colors.grey[300],
-                              valueColor: const AlwaysStoppedAnimation<Color>(Colors.green),
+                              valueColor: const AlwaysStoppedAnimation<Color>(
+                                Colors.green,
+                              ),
                             ),
                             const SizedBox(height: 8),
                             Text(
@@ -357,44 +351,48 @@ class HomeTab extends StatelessWidget {
       children: [
         Text(
           'Recent Moods',
-          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-            fontWeight: FontWeight.bold,
-          ),
+          style: Theme.of(
+            context,
+          ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 16),
         BlocBuilder<MoodBloc, MoodState>(
           builder: (context, state) {
             if (state is MoodLoaded) {
               final recentMoods = state.moodEntries.take(5).toList();
-              
+
               if (recentMoods.isEmpty) {
                 return const Card(
                   child: Padding(
                     padding: EdgeInsets.all(16),
-                    child: Text('No mood entries yet. Start tracking your mood!'),
+                    child: Text(
+                      'No mood entries yet. Start tracking your mood!',
+                    ),
                   ),
                 );
               }
-              
+
               return Card(
                 child: Padding(
                   padding: const EdgeInsets.all(16),
                   child: Column(
-                    children: recentMoods.map<Widget>((mood) {
-                      return ListTile(
-                        leading: Text(
-                          mood.emoji,
-                          style: const TextStyle(fontSize: 24),
-                        ),
-                        title: Text('${mood.moodValue}/5'),
-                        subtitle: Text(
-                          '${mood.date.day}/${mood.date.month}/${mood.date.year}',
-                        ),
-                        trailing: mood.notes != null
-                            ? const Icon(Icons.note, size: 16)
-                            : null,
-                      );
-                    }).toList(),
+                    children:
+                        recentMoods.map<Widget>((mood) {
+                          return ListTile(
+                            leading: Text(
+                              mood.emoji,
+                              style: const TextStyle(fontSize: 24),
+                            ),
+                            title: Text('${mood.moodValue}/5'),
+                            subtitle: Text(
+                              '${mood.date.day}/${mood.date.month}/${mood.date.year}',
+                            ),
+                            trailing:
+                                mood.notes != null
+                                    ? const Icon(Icons.note, size: 16)
+                                    : null,
+                          );
+                        }).toList(),
                   ),
                 ),
               );

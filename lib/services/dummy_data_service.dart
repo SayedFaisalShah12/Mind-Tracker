@@ -8,7 +8,7 @@ class DummyDataService {
   static Future<void> addDummyData() async {
     final moodService = MoodService();
     final habitService = HabitService();
-    
+
     // Add default habits
     final now = DateTime.now();
     final habits = [
@@ -75,7 +75,7 @@ class DummyDataService {
       final date = now.subtract(Duration(days: i));
       final moodValue = _getRandomMoodValue();
       final emoji = _getMoodEmoji(moodValue);
-      
+
       final moodEntry = MoodEntry(
         id: DateTime.now().millisecondsSinceEpoch.toString() + i.toString(),
         date: date,
@@ -86,7 +86,7 @@ class DummyDataService {
         createdAt: date,
         updatedAt: date,
       );
-      
+
       moodEntries.add(moodEntry);
     }
 
@@ -98,11 +98,14 @@ class DummyDataService {
     // Add some habit entries for the past week
     for (int i = 6; i >= 0; i--) {
       final date = now.subtract(Duration(days: i));
-      
+
       for (final habit in habits) {
         final completed = _getRandomBool();
         final habitEntry = HabitEntry(
-          id: DateTime.now().millisecondsSinceEpoch.toString() + habit.id + i.toString(),
+          id:
+              DateTime.now().millisecondsSinceEpoch.toString() +
+              habit.id +
+              i.toString(),
           habitId: habit.id,
           date: date,
           completed: completed,
@@ -110,7 +113,7 @@ class DummyDataService {
           createdAt: date,
           updatedAt: date,
         );
-        
+
         await habitService.toggleHabitEntry(
           habit.id,
           date,
@@ -133,12 +136,18 @@ class DummyDataService {
 
   static String _getMoodEmoji(int moodValue) {
     switch (moodValue) {
-      case 1: return '😢';
-      case 2: return '😔';
-      case 3: return '😐';
-      case 4: return '😊';
-      case 5: return '😄';
-      default: return '😐';
+      case 1:
+        return '😢';
+      case 2:
+        return '😔';
+      case 3:
+        return '😐';
+      case 4:
+        return '😊';
+      case 5:
+        return '😄';
+      default:
+        return '😐';
     }
   }
 
@@ -155,17 +164,28 @@ class DummyDataService {
       'Had some challenges but overcame them.',
       'Spent quality time with family.',
     ];
-    
+
     final random = DateTime.now().millisecondsSinceEpoch % 100;
-    return random < 60 ? notes[random % notes.length] : null; // 60% chance of having a note
+    return random < 60
+        ? notes[random % notes.length]
+        : null; // 60% chance of having a note
   }
 
   static List<String> _getRandomTags() {
-    final allTags = ['Work', 'Family', 'Friends', 'Health', 'Exercise', 'Sleep', 'Food', 'Weather'];
+    final allTags = [
+      'Work',
+      'Family',
+      'Friends',
+      'Health',
+      'Exercise',
+      'Sleep',
+      'Food',
+      'Weather',
+    ];
     final random = DateTime.now().millisecondsSinceEpoch % 100;
-    
+
     if (random < 40) return []; // 40% chance of no tags
-    
+
     final numTags = (random % 3) + 1; // 1-3 tags
     final shuffledTags = List.from(allTags)..shuffle();
     return shuffledTags.take(numTags).toList().cast<String>();
@@ -184,8 +204,10 @@ class DummyDataService {
       'Made me feel productive.',
       'Enjoyed this activity.',
     ];
-    
+
     final random = DateTime.now().millisecondsSinceEpoch % 100;
-    return random < 30 ? notes[random % notes.length] : null; // 30% chance of having a note
+    return random < 30
+        ? notes[random % notes.length]
+        : null; // 30% chance of having a note
   }
 }

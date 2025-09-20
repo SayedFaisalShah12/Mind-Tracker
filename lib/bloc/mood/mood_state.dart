@@ -16,10 +16,7 @@ class MoodLoaded extends MoodState {
   final List<MoodEntry> moodEntries;
   final MoodEntry? todayMoodEntry;
 
-  const MoodLoaded({
-    required this.moodEntries,
-    this.todayMoodEntry,
-  });
+  const MoodLoaded({required this.moodEntries, this.todayMoodEntry});
 
   @override
   List<Object?> get props => [moodEntries, todayMoodEntry];

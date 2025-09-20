@@ -7,8 +7,8 @@ class MoodBloc extends Bloc<MoodEvent, MoodState> {
   final MoodService _moodService;
 
   MoodBloc({required MoodService moodService})
-      : _moodService = moodService,
-        super(MoodInitial()) {
+    : _moodService = moodService,
+      super(MoodInitial()) {
     on<LoadMoodEntries>(_onLoadMoodEntries);
     on<AddMoodEntry>(_onAddMoodEntry);
     on<UpdateMoodEntry>(_onUpdateMoodEntry);
@@ -26,12 +26,13 @@ class MoodBloc extends Bloc<MoodEvent, MoodState> {
         startDate: event.startDate,
         endDate: event.endDate,
       );
-      final todayMoodEntry = await _moodService.getMoodEntryByDate(DateTime.now());
-      
-      emit(MoodLoaded(
-        moodEntries: moodEntries,
-        todayMoodEntry: todayMoodEntry,
-      ));
+      final todayMoodEntry = await _moodService.getMoodEntryByDate(
+        DateTime.now(),
+      );
+
+      emit(
+        MoodLoaded(moodEntries: moodEntries, todayMoodEntry: todayMoodEntry),
+      );
     } catch (e) {
       emit(MoodError(e.toString()));
     }
@@ -44,7 +45,7 @@ class MoodBloc extends Bloc<MoodEvent, MoodState> {
     try {
       await _moodService.addMoodEntry(event.moodEntry);
       emit(MoodEntryAdded(event.moodEntry));
-      
+
       // Reload mood entries to update the list
       add(LoadMoodEntries());
     } catch (e) {
@@ -59,7 +60,7 @@ class MoodBloc extends Bloc<MoodEvent, MoodState> {
     try {
       await _moodService.updateMoodEntry(event.moodEntry);
       emit(MoodEntryUpdated(event.moodEntry));
-      
+
       // Reload mood entries to update the list
       add(LoadMoodEntries());
     } catch (e) {
@@ -74,7 +75,7 @@ class MoodBloc extends Bloc<MoodEvent, MoodState> {
     try {
       await _moodService.deleteMoodEntry(event.moodEntryId);
       emit(MoodEntryDeleted(event.moodEntryId));
-      
+
       // Reload mood entries to update the list
       add(LoadMoodEntries());
     } catch (e) {
@@ -90,10 +91,12 @@ class MoodBloc extends Bloc<MoodEvent, MoodState> {
       final moodEntry = await _moodService.getMoodEntryByDate(event.date);
       if (state is MoodLoaded) {
         final currentState = state as MoodLoaded;
-        emit(MoodLoaded(
-          moodEntries: currentState.moodEntries,
-          todayMoodEntry: moodEntry,
-        ));
+        emit(
+          MoodLoaded(
+            moodEntries: currentState.moodEntries,
+            todayMoodEntry: moodEntry,
+          ),
+        );
       }
     } catch (e) {
       emit(MoodError(e.toString()));
