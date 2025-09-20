@@ -15,29 +15,31 @@ import 'views/app.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   // Initialize Hive
   await Hive.initFlutter();
-  
+
   // Register adapters
   Hive.registerAdapter(MoodEntryAdapter());
   Hive.registerAdapter(HabitAdapter());
   Hive.registerAdapter(HabitEntryAdapter());
   Hive.registerAdapter(UserSettingsAdapter());
-  
+
   // Initialize services
   final moodService = MoodService();
   final habitService = HabitService();
-  
+
   // Check if this is first launch
   final prefs = await SharedPreferences.getInstance();
   final isFirstLaunch = prefs.getBool('is_first_launch') ?? true;
-  
-  runApp(MindTrackerApp(
-    moodService: moodService,
-    habitService: habitService,
-    isFirstLaunch: isFirstLaunch,
-  ));
+
+  runApp(
+    MindTrackerApp(
+      moodService: moodService,
+      habitService: habitService,
+      isFirstLaunch: isFirstLaunch,
+    ),
+  );
 }
 
 class MindTrackerApp extends StatelessWidget {

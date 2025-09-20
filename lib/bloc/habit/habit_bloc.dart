@@ -8,8 +8,8 @@ class HabitBloc extends Bloc<HabitEvent, HabitState> {
   final HabitService _habitService;
 
   HabitBloc({required HabitService habitService})
-      : _habitService = habitService,
-        super(HabitInitial()) {
+    : _habitService = habitService,
+      super(HabitInitial()) {
     on<LoadHabits>(_onLoadHabits);
     on<AddHabit>(_onAddHabit);
     on<UpdateHabit>(_onUpdateHabit);
@@ -20,34 +20,32 @@ class HabitBloc extends Bloc<HabitEvent, HabitState> {
     on<GetHabitEntriesByDate>(_onGetHabitEntriesByDate);
   }
 
-  Future<void> _onLoadHabits(
-    LoadHabits event,
-    Emitter<HabitState> emit,
-  ) async {
+  Future<void> _onLoadHabits(LoadHabits event, Emitter<HabitState> emit) async {
     try {
       emit(HabitLoading());
       final habits = await _habitService.getHabits();
       final habitEntries = await _habitService.getHabitEntries();
-      final todayHabitEntries = await _habitService.getHabitEntriesByDate(DateTime.now());
-      
-      emit(HabitLoaded(
-        habits: habits,
-        habitEntries: habitEntries,
-        todayHabitEntries: todayHabitEntries,
-      ));
+      final todayHabitEntries = await _habitService.getHabitEntriesByDate(
+        DateTime.now(),
+      );
+
+      emit(
+        HabitLoaded(
+          habits: habits,
+          habitEntries: habitEntries,
+          todayHabitEntries: todayHabitEntries,
+        ),
+      );
     } catch (e) {
       emit(HabitError(e.toString()));
     }
   }
 
-  Future<void> _onAddHabit(
-    AddHabit event,
-    Emitter<HabitState> emit,
-  ) async {
+  Future<void> _onAddHabit(AddHabit event, Emitter<HabitState> emit) async {
     try {
       await _habitService.addHabit(event.habit);
       emit(HabitAdded(event.habit));
-      
+
       // Reload habits to update the list
       add(LoadHabits());
     } catch (e) {
@@ -62,7 +60,7 @@ class HabitBloc extends Bloc<HabitEvent, HabitState> {
     try {
       await _habitService.updateHabit(event.habit);
       emit(HabitUpdated(event.habit));
-      
+
       // Reload habits to update the list
       add(LoadHabits());
     } catch (e) {
@@ -77,7 +75,7 @@ class HabitBloc extends Bloc<HabitEvent, HabitState> {
     try {
       await _habitService.deleteHabit(event.habitId);
       emit(HabitDeleted(event.habitId));
-      
+
       // Reload habits to update the list
       add(LoadHabits());
     } catch (e) {
@@ -91,7 +89,7 @@ class HabitBloc extends Bloc<HabitEvent, HabitState> {
   ) async {
     try {
       await _habitService.toggleHabitActive(event.habitId, event.isActive);
-      
+
       // Reload habits to update the list
       add(LoadHabits());
     } catch (e) {
@@ -108,14 +106,16 @@ class HabitBloc extends Bloc<HabitEvent, HabitState> {
         startDate: event.startDate,
         endDate: event.endDate,
       );
-      
+
       if (state is HabitLoaded) {
         final currentState = state as HabitLoaded;
-        emit(HabitLoaded(
-          habits: currentState.habits,
-          habitEntries: habitEntries,
-          todayHabitEntries: currentState.todayHabitEntries,
-        ));
+        emit(
+          HabitLoaded(
+            habits: currentState.habits,
+            habitEntries: habitEntries,
+            todayHabitEntries: currentState.todayHabitEntries,
+          ),
+        );
       }
     } catch (e) {
       emit(HabitError(e.toString()));
@@ -134,7 +134,7 @@ class HabitBloc extends Bloc<HabitEvent, HabitState> {
         event.notes,
       );
       emit(HabitEntryToggled(habitEntry));
-      
+
       // Reload habit entries to update the list
       add(LoadHabitEntries());
     } catch (e) {
@@ -147,15 +147,19 @@ class HabitBloc extends Bloc<HabitEvent, HabitState> {
     Emitter<HabitState> emit,
   ) async {
     try {
-      final habitEntries = await _habitService.getHabitEntriesByDate(event.date);
-      
+      final habitEntries = await _habitService.getHabitEntriesByDate(
+        event.date,
+      );
+
       if (state is HabitLoaded) {
         final currentState = state as HabitLoaded;
-        emit(HabitLoaded(
-          habits: currentState.habits,
-          habitEntries: currentState.habitEntries,
-          todayHabitEntries: habitEntries,
-        ));
+        emit(
+          HabitLoaded(
+            habits: currentState.habits,
+            habitEntries: currentState.habitEntries,
+            todayHabitEntries: habitEntries,
+          ),
+        );
       }
     } catch (e) {
       emit(HabitError(e.toString()));
