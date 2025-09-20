@@ -328,7 +328,7 @@ class HomeTab extends StatelessWidget {
                             ),
                             const SizedBox(height: 8),
                             Text(
-                              '${totalHabits > 0 ? ((completedHabits / totalHabits) * 100).round()}%',
+                              '${totalHabits > 0 ? ((completedHabits / totalHabits) * 100).round() : 0}%',
                               style: Theme.of(context).textTheme.bodyMedium,
                             ),
                           ],

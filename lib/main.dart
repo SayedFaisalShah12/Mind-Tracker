@@ -9,6 +9,7 @@ import 'models/habit_entry.dart';
 import 'models/user_settings.dart';
 import 'services/mood_service.dart';
 import 'services/habit_service.dart';
+import 'services/dummy_data_service.dart';
 import 'bloc/mood/mood_bloc.dart';
 import 'bloc/habit/habit_bloc.dart';
 import 'views/app.dart';
@@ -32,6 +33,11 @@ void main() async {
   // Check if this is first launch
   final prefs = await SharedPreferences.getInstance();
   final isFirstLaunch = prefs.getBool('is_first_launch') ?? true;
+
+  // Add dummy data if first launch
+  if (isFirstLaunch) {
+    await DummyDataService.addDummyData();
+  }
 
   runApp(
     MindTrackerApp(

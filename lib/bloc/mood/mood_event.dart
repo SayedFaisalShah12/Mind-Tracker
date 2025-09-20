@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import '../models/mood_entry.dart';
+import '../../models/mood_entry.dart';
 
 abstract class MoodEvent extends Equatable {
   const MoodEvent();
