@@ -31,7 +31,7 @@ void main() async {
   // Initialize services
   final moodService = MoodService();
   final habitService = HabitService();
-  
+
   // Initialize services
   await NotificationService.initialize();
   await ThemeService.initialize();

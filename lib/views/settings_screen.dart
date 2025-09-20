@@ -7,6 +7,8 @@ import '../bloc/habit/habit_event.dart';
 import '../services/notification_service.dart';
 import '../services/biometric_service.dart';
 import '../services/theme_service.dart';
+import '../services/firebase_service.dart';
+import 'firebase_auth_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -22,6 +24,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   String _reminderTime = '20:00';
   String _primaryColor = 'blue';
   bool _isLoading = false;
+  bool _cloudSyncEnabled = false;
+  bool _isSignedIn = false;
 
   final List<String> _themeModes = ['light', 'dark', 'system'];
   final List<String> _reminderTimes = ['08:00', '12:00', '18:00', '20:00', '22:00'];
@@ -40,6 +44,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
     try {
       final reminderSettings = await NotificationService.getReminderSettings();
       final biometricEnabled = await BiometricService.isEnabled();
+      final cloudSyncEnabled = await FirebaseService.getCloudSyncEnabled();
+      final isSignedIn = FirebaseService.isSignedIn;
       
       setState(() {
         _notificationsEnabled = reminderSettings['enabled'];
@@ -47,6 +53,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
         _biometricEnabled = biometricEnabled;
         _themeMode = ThemeService.getCurrentThemeModeName();
         _primaryColor = ThemeService.getCurrentColorName();
+        _cloudSyncEnabled = cloudSyncEnabled;
+        _isSignedIn = isSignedIn;
       });
     } catch (e) {
       print('Error loading settings: $e');
@@ -130,10 +138,28 @@ class _SettingsScreenState extends State<SettingsScreen> {
               child: Text(mode.capitalize()),
             );
           }).toList(),
-          onChanged: (value) {
+          onChanged: _isLoading ? null : (value) async {
             setState(() {
               _themeMode = value!;
             });
+            
+            // Update theme mode
+            final themeMode = value == 'light' 
+                ? ThemeMode.light 
+                : value == 'dark' 
+                    ? ThemeMode.dark 
+                    : ThemeMode.system;
+            await ThemeService.setThemeMode(themeMode);
+            
+            // Restart app to apply theme changes
+            if (context.mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Theme updated! Restart the app to see changes.'),
+                  backgroundColor: Colors.green,
+                ),
+              );
+            }
           },
         ),
       ],
@@ -152,16 +178,29 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ),
         const SizedBox(height: 8),
         Row(
-          children: _colors.map((colorData) {
-            final colorName = colorData['name'] as String;
-            final color = colorData['color'] as Color;
+          children: ThemeService.availableColors.entries.map((entry) {
+            final colorName = entry.key;
+            final color = entry.value;
             final isSelected = _primaryColor == colorName;
             
             return GestureDetector(
-              onTap: () {
+              onTap: _isLoading ? null : () async {
                 setState(() {
                   _primaryColor = colorName;
                 });
+                
+                // Update primary color
+                await ThemeService.setPrimaryColor(colorName);
+                
+                // Restart app to apply color changes
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Color updated! Restart the app to see changes.'),
+                      backgroundColor: Colors.green,
+                    ),
+                  );
+                }
               },
               child: Container(
                 margin: const EdgeInsets.only(right: 12),
@@ -402,15 +441,31 @@ class _SettingsScreenState extends State<SettingsScreen> {
               onTap: _importData,
             ),
             ListTile(
-              leading: const Icon(Icons.cloud_sync),
-              title: const Text('Cloud Sync'),
-              subtitle: const Text('Sync data across devices (Coming Soon)'),
-              onTap: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Cloud sync feature coming soon!'),
-                  ),
-                );
+              leading: Icon(
+                _isSignedIn ? Icons.cloud_done : Icons.cloud_sync,
+                color: _isSignedIn ? Colors.green : Colors.blue,
+              ),
+              title: Text(_isSignedIn ? 'Cloud Sync (Enabled)' : 'Cloud Sync'),
+              subtitle: Text(
+                _isSignedIn 
+                    ? 'Signed in as ${FirebaseService.currentUser?.email}'
+                    : 'Sync data across devices with Firebase',
+              ),
+              onTap: _isLoading ? null : () async {
+                if (_isSignedIn) {
+                  // Show sync options
+                  _showSyncOptions();
+                } else {
+                  // Navigate to auth screen
+                  final result = await Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => const FirebaseAuthScreen(),
+                    ),
+                  );
+                  
+                  // Reload settings after returning from auth screen
+                  _loadSettings();
+                }
               },
             ),
             ListTile(
