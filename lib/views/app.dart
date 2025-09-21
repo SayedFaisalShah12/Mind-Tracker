@@ -24,13 +24,6 @@ class _AppState extends State<App> {
   Future<void> _markFirstLaunchComplete() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('is_first_launch', false);
-    print("This is Working");
-    print("This is Working");
-    print("This is Working");
-    print("This is Working");
-    print("This is Working");
-    print("This is Working");
-    print("This is Working");
   }
 
   @override
