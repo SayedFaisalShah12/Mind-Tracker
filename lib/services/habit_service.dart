@@ -17,7 +17,18 @@ class HabitService {
 
   Future<List<Habit>> getHabits() async {
     final box = await _habitsBox;
-    return box.values.where((habit) => habit.isActive).toList();
+    final allHabits = box.values.toList();
+    final activeHabits = allHabits.where((habit) => habit.isActive).toList();
+
+    print(
+      'DEBUG: HabitService.getHabits - Total habits in box: ${allHabits.length}',
+    );
+    print(
+      'DEBUG: HabitService.getHabits - Active habits: ${activeHabits.length}',
+    );
+    print('DEBUG: HabitService.getHabits - Box keys: ${box.keys.toList()}');
+
+    return activeHabits;
   }
 
   Future<List<HabitEntry>> getHabitEntries({
@@ -29,8 +40,10 @@ class HabitService {
 
     if (startDate != null && endDate != null) {
       return entries.where((entry) {
-        return entry.date.isAfter(startDate.subtract(const Duration(days: 1))) &&
-               entry.date.isBefore(endDate.add(const Duration(days: 1)));
+        return entry.date.isAfter(
+              startDate.subtract(const Duration(days: 1)),
+            ) &&
+            entry.date.isBefore(endDate.add(const Duration(days: 1)));
       }).toList();
     }
 
@@ -39,11 +52,23 @@ class HabitService {
 
   Future<Map<String, HabitEntry>> getHabitEntriesByDate(DateTime date) async {
     final box = await _habitEntriesBox;
-    final entries = box.values.where((entry) {
-      return entry.date.year == date.year &&
-             entry.date.month == date.month &&
-             entry.date.day == date.day;
-    }).toList();
+    final allEntries = box.values.toList();
+    final entries =
+        allEntries.where((entry) {
+          return entry.date.year == date.year &&
+              entry.date.month == date.month &&
+              entry.date.day == date.day;
+        }).toList();
+
+    print(
+      'DEBUG: HabitService.getHabitEntriesByDate - Total entries in box: ${allEntries.length}',
+    );
+    print(
+      'DEBUG: HabitService.getHabitEntriesByDate - Entries for date ${date.toString()}: ${entries.length}',
+    );
+    print(
+      'DEBUG: HabitService.getHabitEntriesByDate - Box keys: ${box.keys.toList()}',
+    );
 
     final Map<String, HabitEntry> result = {};
     for (final entry in entries) {
@@ -65,14 +90,15 @@ class HabitService {
   Future<void> deleteHabit(String habitId) async {
     final box = await _habitsBox;
     await box.delete(habitId);
-    
+
     // Also delete all related habit entries
     final entriesBox = await _habitEntriesBox;
-    final entriesToDelete = entriesBox.values
-        .where((entry) => entry.habitId == habitId)
-        .map((entry) => entry.id)
-        .toList();
-    
+    final entriesToDelete =
+        entriesBox.values
+            .where((entry) => entry.habitId == habitId)
+            .map((entry) => entry.id)
+            .toList();
+
     for (final entryId in entriesToDelete) {
       await entriesBox.delete(entryId);
     }
@@ -94,20 +120,22 @@ class HabitService {
     String? notes,
   ) async {
     final box = await _habitEntriesBox;
-    
+
     // Check if entry already exists for this date and habit
     final existingEntry = box.values.firstWhere(
-      (entry) => entry.habitId == habitId &&
-                 entry.date.year == date.year &&
-                 entry.date.month == date.month &&
-                 entry.date.day == date.day,
-      orElse: () => HabitEntry(
-        id: '',
-        habitId: '',
-        date: DateTime.now(),
-        createdAt: DateTime.now(),
-        updatedAt: DateTime.now(),
-      ),
+      (entry) =>
+          entry.habitId == habitId &&
+          entry.date.year == date.year &&
+          entry.date.month == date.month &&
+          entry.date.day == date.day,
+      orElse:
+          () => HabitEntry(
+            id: '',
+            habitId: '',
+            date: DateTime.now(),
+            createdAt: DateTime.now(),
+            updatedAt: DateTime.now(),
+          ),
     );
 
     if (existingEntry.id.isEmpty) {
@@ -146,16 +174,22 @@ class HabitService {
     return getHabitEntries(startDate: weekStart, endDate: endDate);
   }
 
-  Future<double> getHabitCompletionRate(String habitId, {
+  Future<double> getHabitCompletionRate(
+    String habitId, {
     DateTime? startDate,
     DateTime? endDate,
   }) async {
-    final entries = await getHabitEntries(startDate: startDate, endDate: endDate);
-    final habitEntries = entries.where((entry) => entry.habitId == habitId).toList();
-    
+    final entries = await getHabitEntries(
+      startDate: startDate,
+      endDate: endDate,
+    );
+    final habitEntries =
+        entries.where((entry) => entry.habitId == habitId).toList();
+
     if (habitEntries.isEmpty) return 0.0;
-    
-    final completedCount = habitEntries.where((entry) => entry.completed).length;
+
+    final completedCount =
+        habitEntries.where((entry) => entry.completed).length;
     return completedCount / habitEntries.length;
   }
 }

@@ -21,11 +21,20 @@ class HabitBloc extends Bloc<HabitEvent, HabitState> {
 
   Future<void> _onLoadHabits(LoadHabits event, Emitter<HabitState> emit) async {
     try {
+      print('DEBUG: HabitBloc._onLoadHabits - Starting to load habits');
       emit(HabitLoading());
       final habits = await _habitService.getHabits();
       final habitEntries = await _habitService.getHabitEntries();
       final todayHabitEntries = await _habitService.getHabitEntriesByDate(
         DateTime.now(),
+      );
+
+      print('DEBUG: HabitBloc._onLoadHabits - Loaded ${habits.length} habits');
+      print(
+        'DEBUG: HabitBloc._onLoadHabits - Loaded ${habitEntries.length} habit entries',
+      );
+      print(
+        'DEBUG: HabitBloc._onLoadHabits - Today habit entries: ${todayHabitEntries.length}',
       );
 
       emit(
@@ -36,6 +45,7 @@ class HabitBloc extends Bloc<HabitEvent, HabitState> {
         ),
       );
     } catch (e) {
+      print('DEBUG: HabitBloc._onLoadHabits - Error: $e');
       emit(HabitError(e.toString()));
     }
   }

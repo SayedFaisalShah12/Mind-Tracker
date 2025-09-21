@@ -21,6 +21,9 @@ class MoodBloc extends Bloc<MoodEvent, MoodState> {
     Emitter<MoodState> emit,
   ) async {
     try {
+      print(
+        'DEBUG: MoodBloc._onLoadMoodEntries - Starting to load mood entries',
+      );
       emit(MoodLoading());
       final moodEntries = await _moodService.getMoodEntries(
         startDate: event.startDate,
@@ -30,10 +33,18 @@ class MoodBloc extends Bloc<MoodEvent, MoodState> {
         DateTime.now(),
       );
 
+      print(
+        'DEBUG: MoodBloc._onLoadMoodEntries - Loaded ${moodEntries.length} mood entries',
+      );
+      print(
+        'DEBUG: MoodBloc._onLoadMoodEntries - Today mood entry: ${todayMoodEntry?.toString()}',
+      );
+
       emit(
         MoodLoaded(moodEntries: moodEntries, todayMoodEntry: todayMoodEntry),
       );
     } catch (e) {
+      print('DEBUG: MoodBloc._onLoadMoodEntries - Error: $e');
       emit(MoodError(e.toString()));
     }
   }

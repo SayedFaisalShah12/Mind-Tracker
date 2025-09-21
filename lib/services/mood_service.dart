@@ -16,23 +16,39 @@ class MoodService {
     final box = await _box;
     final entries = box.values.toList();
 
+    print(
+      'DEBUG: MoodService.getMoodEntries - Total entries in box: ${entries.length}',
+    );
+    print('DEBUG: MoodService.getMoodEntries - Box keys: ${box.keys.toList()}');
+
     if (startDate != null && endDate != null) {
-      return entries.where((entry) {
-        return entry.date.isAfter(startDate.subtract(const Duration(days: 1))) &&
-               entry.date.isBefore(endDate.add(const Duration(days: 1)));
-      }).toList();
+      final filteredEntries =
+          entries.where((entry) {
+            return entry.date.isAfter(
+                  startDate.subtract(const Duration(days: 1)),
+                ) &&
+                entry.date.isBefore(endDate.add(const Duration(days: 1)));
+          }).toList();
+      print(
+        'DEBUG: MoodService.getMoodEntries - Filtered entries: ${filteredEntries.length}',
+      );
+      return filteredEntries;
     }
 
+    print(
+      'DEBUG: MoodService.getMoodEntries - Returning all entries: ${entries.length}',
+    );
     return entries;
   }
 
   Future<MoodEntry?> getMoodEntryByDate(DateTime date) async {
     final box = await _box;
-    final entries = box.values.where((entry) {
-      return entry.date.year == date.year &&
-             entry.date.month == date.month &&
-             entry.date.day == date.day;
-    }).toList();
+    final entries =
+        box.values.where((entry) {
+          return entry.date.year == date.year &&
+              entry.date.month == date.month &&
+              entry.date.day == date.day;
+        }).toList();
 
     return entries.isNotEmpty ? entries.first : null;
   }
@@ -67,9 +83,12 @@ class MoodService {
     DateTime? startDate,
     DateTime? endDate,
   }) async {
-    final entries = await getMoodEntries(startDate: startDate, endDate: endDate);
+    final entries = await getMoodEntries(
+      startDate: startDate,
+      endDate: endDate,
+    );
     if (entries.isEmpty) return 0.0;
-    
+
     final total = entries.fold<int>(0, (sum, entry) => sum + entry.moodValue);
     return total / entries.length;
   }

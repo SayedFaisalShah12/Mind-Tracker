@@ -6,6 +6,7 @@ import 'habit_service.dart';
 
 class DummyDataService {
   static Future<void> addDummyData() async {
+    print('DEBUG: DummyDataService.addDummyData - Starting to add dummy data');
     final moodService = MoodService();
     final habitService = HabitService();
 
@@ -65,8 +66,14 @@ class DummyDataService {
     ];
 
     // Add habits
+    print(
+      'DEBUG: DummyDataService.addDummyData - Adding ${habits.length} habits',
+    );
     for (final habit in habits) {
       await habitService.addHabit(habit);
+      print(
+        'DEBUG: DummyDataService.addDummyData - Added habit: ${habit.name}',
+      );
     }
 
     // Add some mood entries for the past week
@@ -91,8 +98,14 @@ class DummyDataService {
     }
 
     // Add mood entries
+    print(
+      'DEBUG: DummyDataService.addDummyData - Adding ${moodEntries.length} mood entries',
+    );
     for (final moodEntry in moodEntries) {
       await moodService.addMoodEntry(moodEntry);
+      print(
+        'DEBUG: DummyDataService.addDummyData - Added mood entry for ${moodEntry.date.toString()}',
+      );
     }
 
     // Add some habit entries for the past week
@@ -122,6 +135,7 @@ class DummyDataService {
         );
       }
     }
+    print('DEBUG: DummyDataService.addDummyData - Finished adding dummy data');
   }
 
   static int _getRandomMoodValue() {

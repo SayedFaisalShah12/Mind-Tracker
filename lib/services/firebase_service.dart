@@ -18,6 +18,13 @@ class FirebaseService {
     if (_initialized) return;
 
     try {
+      // Check if Firebase is already initialized
+      if (Firebase.apps.isEmpty) {
+        print('Firebase not configured - running in local-only mode');
+        _initialized = false;
+        return;
+      }
+      
       await Firebase.initializeApp();
       _initialized = true;
 
@@ -25,8 +32,12 @@ class FirebaseService {
       _auth.authStateChanges().listen((User? user) {
         _currentUser = user;
       });
+      
+      print('Firebase initialized successfully');
     } catch (e) {
       print('Firebase initialization error: $e');
+      print('Running in local-only mode without Firebase');
+      _initialized = false;
     }
   }
 
@@ -39,6 +50,11 @@ class FirebaseService {
     required String email,
     required String password,
   }) async {
+    if (!_initialized) {
+      print('Firebase not initialized - cannot sign in');
+      return AuthResult.failure;
+    }
+    
     try {
       final credential = await _auth.signInWithEmailAndPassword(
         email: email,
@@ -61,6 +77,11 @@ class FirebaseService {
     required String email,
     required String password,
   }) async {
+    if (!_initialized) {
+      print('Firebase not initialized - cannot create user');
+      return AuthResult.failure;
+    }
+    
     try {
       final credential = await _auth.createUserWithEmailAndPassword(
         email: email,
@@ -80,6 +101,11 @@ class FirebaseService {
   }
 
   static Future<void> signOut() async {
+    if (!_initialized) {
+      print('Firebase not initialized - cannot sign out');
+      return;
+    }
+    
     try {
       await _auth.signOut();
       await _clearUserPreferences();
@@ -89,6 +115,11 @@ class FirebaseService {
   }
 
   static Future<void> resetPassword(String email) async {
+    if (!_initialized) {
+      print('Firebase not initialized - cannot reset password');
+      return;
+    }
+    
     try {
       await _auth.sendPasswordResetEmail(email: email);
     } catch (e) {
