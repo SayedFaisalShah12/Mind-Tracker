@@ -20,6 +20,7 @@ class _AppState extends State<App> {
       _markFirstLaunchComplete();
 
       print("This is Working");
+      print("This is Working");
     }
   }
 
