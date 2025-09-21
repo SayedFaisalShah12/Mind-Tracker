@@ -1,5 +1,4 @@
 import 'package:hive/hive.dart';
-import 'package:path_provider/path_provider.dart';
 
 class HiveHelper {
   static bool _initialized = false;
@@ -7,9 +6,8 @@ class HiveHelper {
   static Future<void> init() async {
     if (_initialized) return;
 
-    final appDocumentDir = await getApplicationDocumentsDirectory();
-    Hive.init(appDocumentDir.path);
-
+    // Use Hive.initFlutter() which works on both web and mobile
+    Hive.initFlutter();
     _initialized = true;
   }
 
