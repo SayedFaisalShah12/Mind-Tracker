@@ -6,8 +6,8 @@ class HiveHelper {
   static Future<void> init() async {
     if (_initialized) return;
 
-    // Use Hive.initFlutter() which works on both web and mobile
-    Hive.initFlutter();
+    // For web, Hive can be initialized without a path
+    Hive.init('');
     _initialized = true;
   }
 
