@@ -18,15 +18,13 @@ class _AppState extends State<App> {
     super.initState();
     if (widget.isFirstLaunch) {
       _markFirstLaunchComplete();
-
-      print("This is Working");
-      print("This is Working");
     }
   }
 
   Future<void> _markFirstLaunchComplete() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('is_first_launch', false);
+    print("This is Working");
     print("This is Working");
   }
 
