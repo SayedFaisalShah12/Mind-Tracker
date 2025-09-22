@@ -25,6 +25,7 @@ class _AppState extends State<App> {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('is_first_launch', false);
     print("This is working");
+    print("This is working");
   }
 
   @override
