@@ -187,7 +187,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w500),
         ),
         const SizedBox(height: 8),
-        Row(
+        Wrap(
+          spacing: 12,
+          runSpacing: 12,
           children:
               ThemeService.availableColors.entries.map((entry) {
                 final colorName = entry.key;
@@ -219,7 +221,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             }
                           },
                   child: Container(
-                    margin: const EdgeInsets.only(right: 12),
                     width: 40,
                     height: 40,
                     decoration: BoxDecoration(
