@@ -128,9 +128,9 @@ class HomeTab extends StatelessWidget {
             const SizedBox(height: 8),
             Text(
               'How are you feeling today?',
-              style: Theme.of(
-                context,
-              ).textTheme.bodyLarge?.copyWith(color: Colors.grey[600]),
+              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
             ),
             const SizedBox(height: 16),
             BlocBuilder<MoodBloc, MoodState>(
@@ -188,7 +188,7 @@ class HomeTab extends StatelessWidget {
                 context,
                 'Log Mood',
                 Icons.mood,
-                Colors.blue,
+                Theme.of(context).colorScheme.primary,
                 () => Navigator.of(context).push(
                   MaterialPageRoute(
                     builder: (context) => const MoodTrackingScreen(),
@@ -202,7 +202,7 @@ class HomeTab extends StatelessWidget {
                 context,
                 'Check Habits',
                 Icons.check_circle,
-                Colors.green,
+                Theme.of(context).colorScheme.secondary,
                 () => Navigator.of(context).push(
                   MaterialPageRoute(builder: (context) => const HabitsScreen()),
                 ),
@@ -218,7 +218,7 @@ class HomeTab extends StatelessWidget {
                 context,
                 'View Stats',
                 Icons.analytics,
-                Colors.purple,
+                Theme.of(context).colorScheme.tertiary,
                 () => Navigator.of(context).push(
                   MaterialPageRoute(
                     builder: (context) => const StatisticsScreen(),
@@ -232,7 +232,7 @@ class HomeTab extends StatelessWidget {
                 context,
                 'Settings',
                 Icons.settings,
-                Colors.orange,
+                Theme.of(context).colorScheme.primary,
                 () => Navigator.of(context).push(
                   MaterialPageRoute(
                     builder: (context) => const SettingsScreen(),
@@ -311,7 +311,7 @@ class HomeTab extends StatelessWidget {
                                 context,
                               ).textTheme.headlineMedium?.copyWith(
                                 fontWeight: FontWeight.bold,
-                                color: Colors.green,
+                                color: Theme.of(context).colorScheme.primary,
                               ),
                             ),
                             Text(
@@ -329,9 +329,10 @@ class HomeTab extends StatelessWidget {
                                   totalHabits > 0
                                       ? completedHabits / totalHabits
                                       : 0,
-                              backgroundColor: Colors.grey[300],
-                              valueColor: const AlwaysStoppedAnimation<Color>(
-                                Colors.green,
+                              backgroundColor:
+                                  Theme.of(context).colorScheme.surfaceVariant,
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                Theme.of(context).colorScheme.primary,
                               ),
                             ),
                             const SizedBox(height: 8),

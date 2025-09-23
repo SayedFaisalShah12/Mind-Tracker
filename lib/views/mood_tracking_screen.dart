@@ -15,12 +15,20 @@ class MoodTrackingScreen extends StatefulWidget {
 class _MoodTrackingScreenState extends State<MoodTrackingScreen> {
   final TextEditingController _notesController = TextEditingController();
   final List<String> _selectedTags = [];
-  
+
   int _selectedMood = 3; // Default to neutral mood
   final List<String> _moodEmojis = ['😢', '😔', '😐', '😊', '😄'];
   final List<String> _availableTags = [
-    'Work', 'Family', 'Friends', 'Health', 'Exercise',
-    'Sleep', 'Food', 'Weather', 'Travel', 'Learning'
+    'Work',
+    'Family',
+    'Friends',
+    'Health',
+    'Exercise',
+    'Sleep',
+    'Food',
+    'Weather',
+    'Travel',
+    'Learning',
   ];
 
   @override
@@ -86,19 +94,22 @@ class _MoodTrackingScreenState extends State<MoodTrackingScreen> {
   Widget _buildDateHeader() {
     final now = DateTime.now();
     final dateStr = '${now.day}/${now.month}/${now.year}';
-    
+
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Row(
           children: [
-            const Icon(Icons.calendar_today, color: Colors.blue),
+            Icon(
+              Icons.calendar_today,
+              color: Theme.of(context).colorScheme.primary,
+            ),
             const SizedBox(width: 12),
             Text(
               'Today - $dateStr',
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
             ),
           ],
         ),
@@ -112,9 +123,9 @@ class _MoodTrackingScreenState extends State<MoodTrackingScreen> {
       children: [
         Text(
           'How are you feeling?',
-          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-            fontWeight: FontWeight.bold,
-          ),
+          style: Theme.of(
+            context,
+          ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 16),
         Row(
@@ -122,7 +133,7 @@ class _MoodTrackingScreenState extends State<MoodTrackingScreen> {
           children: List.generate(5, (index) {
             final moodValue = index + 1;
             final isSelected = _selectedMood == moodValue;
-            
+
             return GestureDetector(
               onTap: () {
                 setState(() {
@@ -133,23 +144,25 @@ class _MoodTrackingScreenState extends State<MoodTrackingScreen> {
                 width: 60,
                 height: 60,
                 decoration: BoxDecoration(
-                  color: isSelected 
-                      ? Theme.of(context).colorScheme.primary.withOpacity(0.2)
-                      : Colors.grey[100],
+                  color:
+                      isSelected
+                          ? Theme.of(
+                            context,
+                          ).colorScheme.primary.withOpacity(0.2)
+                          : Theme.of(context).colorScheme.surfaceVariant,
                   borderRadius: BorderRadius.circular(30),
                   border: Border.all(
-                    color: isSelected 
-                        ? Theme.of(context).colorScheme.primary
-                        : Colors.grey[300]!,
+                    color:
+                        isSelected
+                            ? Theme.of(context).colorScheme.primary
+                            : Theme.of(context).colorScheme.outlineVariant,
                     width: isSelected ? 2 : 1,
                   ),
                 ),
                 child: Center(
                   child: Text(
                     _moodEmojis[index],
-                    style: TextStyle(
-                      fontSize: isSelected ? 32 : 28,
-                    ),
+                    style: TextStyle(fontSize: isSelected ? 32 : 28),
                   ),
                 ),
               ),
@@ -161,7 +174,7 @@ class _MoodTrackingScreenState extends State<MoodTrackingScreen> {
           child: Text(
             _getMoodDescription(_selectedMood),
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: Colors.grey[600],
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
           ),
         ),
@@ -175,9 +188,9 @@ class _MoodTrackingScreenState extends State<MoodTrackingScreen> {
       children: [
         Text(
           'Notes (Optional)',
-          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-            fontWeight: FontWeight.bold,
-          ),
+          style: Theme.of(
+            context,
+          ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 12),
         TextField(
@@ -185,11 +198,9 @@ class _MoodTrackingScreenState extends State<MoodTrackingScreen> {
           maxLines: 4,
           decoration: InputDecoration(
             hintText: 'How was your day? What made you feel this way?',
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
             filled: true,
-            fillColor: Colors.grey[50],
+            fillColor: Theme.of(context).colorScheme.surfaceVariant,
           ),
         ),
       ],
@@ -202,30 +213,31 @@ class _MoodTrackingScreenState extends State<MoodTrackingScreen> {
       children: [
         Text(
           'Tags (Optional)',
-          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-            fontWeight: FontWeight.bold,
-          ),
+          style: Theme.of(
+            context,
+          ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 12),
         Wrap(
           spacing: 8,
           runSpacing: 8,
-          children: _availableTags.map((tag) {
-            final isSelected = _selectedTags.contains(tag);
-            return FilterChip(
-              label: Text(tag),
-              selected: isSelected,
-              onSelected: (selected) {
-                setState(() {
-                  if (selected) {
-                    _selectedTags.add(tag);
-                  } else {
-                    _selectedTags.remove(tag);
-                  }
-                });
-              },
-            );
-          }).toList(),
+          children:
+              _availableTags.map((tag) {
+                final isSelected = _selectedTags.contains(tag);
+                return FilterChip(
+                  label: Text(tag),
+                  selected: isSelected,
+                  onSelected: (selected) {
+                    setState(() {
+                      if (selected) {
+                        _selectedTags.add(tag);
+                      } else {
+                        _selectedTags.remove(tag);
+                      }
+                    });
+                  },
+                );
+              }).toList(),
         ),
       ],
     );
@@ -257,7 +269,10 @@ class _MoodTrackingScreenState extends State<MoodTrackingScreen> {
       date: now,
       moodValue: _selectedMood,
       emoji: _moodEmojis[_selectedMood - 1],
-      notes: _notesController.text.trim().isEmpty ? null : _notesController.text.trim(),
+      notes:
+          _notesController.text.trim().isEmpty
+              ? null
+              : _notesController.text.trim(),
       tags: List.from(_selectedTags),
       createdAt: now,
       updatedAt: now,

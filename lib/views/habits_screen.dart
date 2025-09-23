@@ -46,7 +46,11 @@ class _HabitsScreenState extends State<HabitsScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.error, size: 64, color: Colors.red[300]),
+                  Icon(
+                    Icons.error,
+                    size: 64,
+                    color: Theme.of(context).colorScheme.error,
+                  ),
                   const SizedBox(height: 16),
                   Text(
                     'Error: ${state.message}',
@@ -90,15 +94,15 @@ class _HabitsScreenState extends State<HabitsScreen> {
               'No Habits Yet',
               style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                 fontWeight: FontWeight.bold,
-                color: Colors.grey[600],
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
             ),
             const SizedBox(height: 12),
             Text(
               'Start building healthy habits by adding your first one!',
-              style: Theme.of(
-                context,
-              ).textTheme.bodyLarge?.copyWith(color: Colors.grey[500]),
+              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 32),
@@ -165,17 +169,19 @@ class _HabitsScreenState extends State<HabitsScreen> {
                   const SizedBox(height: 8),
                   Text(
                     '$completedCount of $totalCount habits completed',
-                    style: Theme.of(
-                      context,
-                    ).textTheme.bodyMedium?.copyWith(color: Colors.grey[600]),
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
                   ),
                 ],
               ),
             ),
             CircularProgressIndicator(
               value: totalCount > 0 ? completedCount / totalCount : 0,
-              backgroundColor: Colors.grey[300],
-              valueColor: const AlwaysStoppedAnimation<Color>(Colors.green),
+              backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
+              valueColor: AlwaysStoppedAnimation<Color>(
+                Theme.of(context).colorScheme.primary,
+              ),
             ),
           ],
         ),
@@ -209,13 +215,19 @@ class _HabitsScreenState extends State<HabitsScreen> {
           style: TextStyle(
             fontWeight: FontWeight.w500,
             decoration: isCompleted ? TextDecoration.lineThrough : null,
-            color: isCompleted ? Colors.grey[600] : null,
+            color:
+                isCompleted
+                    ? Theme.of(context).colorScheme.onSurfaceVariant
+                    : null,
           ),
         ),
         subtitle: Text(
           isCompleted ? 'Completed today' : 'Not completed today',
           style: TextStyle(
-            color: isCompleted ? Colors.green[600] : Colors.grey[500],
+            color:
+                isCompleted
+                    ? Theme.of(context).colorScheme.primary
+                    : Theme.of(context).colorScheme.onSurfaceVariant,
           ),
         ),
         trailing: Checkbox(

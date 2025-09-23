@@ -133,7 +133,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           decoration: InputDecoration(
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
             filled: true,
-            fillColor: Colors.grey[50],
+            fillColor: Theme.of(context).colorScheme.surfaceVariant,
           ),
           items:
               _themeModes.map((mode) {
@@ -334,7 +334,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           decoration: InputDecoration(
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
             filled: true,
-            fillColor: Colors.grey[50],
+            fillColor: Theme.of(context).colorScheme.surfaceVariant,
           ),
           items:
               _reminderTimes.map((time) {
