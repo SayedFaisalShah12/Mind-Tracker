@@ -79,6 +79,8 @@ class ThemeService {
   static ThemeData getLightTheme() {
     return ThemeData(
       useMaterial3: true,
+      fontFamily: 'Times New Roman',
+      fontFamilyFallback: const ['Times', 'Georgia', 'serif'],
       colorScheme: ColorScheme.fromSeed(
         seedColor: _primaryColor,
         brightness: Brightness.light,
@@ -110,6 +112,8 @@ class ThemeService {
   static ThemeData getDarkTheme() {
     return ThemeData(
       useMaterial3: true,
+      fontFamily: 'Times New Roman',
+      fontFamilyFallback: const ['Times', 'Georgia', 'serif'],
       colorScheme: ColorScheme.fromSeed(
         seedColor: _primaryColor,
         brightness: Brightness.dark,
