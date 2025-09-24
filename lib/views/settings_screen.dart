@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'dart:convert';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../bloc/mood/mood_bloc.dart';
 import '../bloc/mood/mood_event.dart';
@@ -10,6 +12,10 @@ import '../services/theme_service.dart';
 import '../services/firebase_service.dart';
 import '../services/mood_service.dart';
 import '../services/habit_service.dart';
+import '../utils/hive_helper.dart';
+import '../models/habit.dart';
+import '../models/mood_entry.dart';
+import '../models/habit_entry.dart';
 import 'firebase_auth_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -559,14 +565,181 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   void _exportData() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Export feature coming soon!')),
-    );
+    () async {
+      setState(() {
+        _isLoading = true;
+      });
+
+      try {
+        final moodService = MoodService();
+        final habitService = HabitService();
+
+        final moods = await moodService.getMoodEntries();
+        final habits = await habitService.getHabits();
+        final habitEntries = await habitService.getHabitEntries();
+
+        final exportPayload = {
+          'version': 1,
+          'exportedAt': DateTime.now().toIso8601String(),
+          'moodEntries': moods.map((e) => e.toJson()).toList(),
+          'habits': habits.map((e) => e.toJson()).toList(),
+          'habitEntries': habitEntries.map((e) => e.toJson()).toList(),
+        };
+
+        final jsonStr = const JsonEncoder.withIndent(
+          '  ',
+        ).convert(exportPayload);
+
+        if (!mounted) return;
+        showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              title: const Text('Export Data (JSON)'),
+              content: SizedBox(
+                width: double.maxFinite,
+                child: SingleChildScrollView(child: SelectableText(jsonStr)),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Text('Close'),
+                ),
+                ElevatedButton.icon(
+                  onPressed: () async {
+                    await Clipboard.setData(ClipboardData(text: jsonStr));
+                    if (mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Copied to clipboard'),
+                          backgroundColor: Colors.green,
+                        ),
+                      );
+                    }
+                  },
+                  icon: const Icon(Icons.copy),
+                  label: const Text('Copy'),
+                ),
+              ],
+            );
+          },
+        );
+      } catch (e) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Export failed: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      } finally {
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+          });
+        }
+      }
+    }();
   }
 
   void _importData() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Import feature coming soon!')),
+    String input = '';
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Import Data (Paste JSON)'),
+          content: SizedBox(
+            width: double.maxFinite,
+            child: TextField(
+              onChanged: (v) => input = v,
+              maxLines: 12,
+              decoration: const InputDecoration(
+                hintText: 'Paste exported JSON here',
+              ),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton.icon(
+              onPressed: () async {
+                Navigator.of(context).pop();
+                setState(() {
+                  _isLoading = true;
+                });
+
+                try {
+                  final decoded = json.decode(input) as Map<String, dynamic>;
+                  final moods =
+                      (decoded['moodEntries'] as List<dynamic>? ?? [])
+                          .map((e) => Map<String, dynamic>.from(e as Map))
+                          .toList();
+                  final habits =
+                      (decoded['habits'] as List<dynamic>? ?? [])
+                          .map((e) => Map<String, dynamic>.from(e as Map))
+                          .toList();
+                  final habitEntries =
+                      (decoded['habitEntries'] as List<dynamic>? ?? [])
+                          .map((e) => Map<String, dynamic>.from(e as Map))
+                          .toList();
+
+                  final moodService = MoodService();
+                  final habitService = HabitService();
+
+                  // Import habits first (ids referenced by entries)
+                  for (final h in habits) {
+                    await habitService.addHabit(Habit.fromJson(h));
+                  }
+                  // Import mood entries
+                  for (final m in moods) {
+                    await moodService.addMoodEntry(MoodEntry.fromJson(m));
+                  }
+                  // Import habit entries
+                  for (final he in habitEntries) {
+                    final entry = HabitEntry.fromJson(he);
+                    await habitService.toggleHabitEntry(
+                      entry.habitId,
+                      entry.date,
+                      entry.completed,
+                      entry.notes,
+                    );
+                  }
+
+                  if (!mounted) return;
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Import complete'),
+                      backgroundColor: Colors.green,
+                    ),
+                  );
+                  // Refresh data in app
+                  context.read<MoodBloc>().add(LoadMoodEntries());
+                  context.read<HabitBloc>().add(LoadHabits());
+                } catch (e) {
+                  if (!mounted) return;
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Invalid JSON or import failed: $e'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                } finally {
+                  if (mounted) {
+                    setState(() {
+                      _isLoading = false;
+                    });
+                  }
+                }
+              },
+              icon: const Icon(Icons.file_download),
+              label: const Text('Import'),
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -598,17 +771,45 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   void _clearAllData() {
-    // Clear mood data
-    context.read<MoodBloc>().add(LoadMoodEntries());
-    // Clear habit data
-    context.read<HabitBloc>().add(LoadHabits());
+    () async {
+      setState(() {
+        _isLoading = true;
+      });
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('All data has been cleared'),
-        backgroundColor: Colors.red,
-      ),
-    );
+      try {
+        await HiveHelper.clearBox('mood_entries');
+        await HiveHelper.clearBox('habits');
+        await HiveHelper.clearBox('habit_entries');
+
+        // Refresh app state
+        if (mounted) {
+          context.read<MoodBloc>().add(LoadMoodEntries());
+          context.read<HabitBloc>().add(LoadHabits());
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('All data has been cleared'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Failed to clear data: $e'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      } finally {
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+          });
+        }
+      }
+    }();
   }
 
   void _showPrivacyPolicy() {
@@ -654,8 +855,45 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   void _sendFeedback() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Feedback feature coming soon!')),
+    const supportEmail = 'support@mindtracker.app';
+    showDialog(
+      context: context,
+      builder:
+          (context) => AlertDialog(
+            title: const Text('Send Feedback'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: const [
+                Text('Please email your feedback to:'),
+                SizedBox(height: 8),
+                SelectableText(supportEmail),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text('Close'),
+              ),
+              ElevatedButton.icon(
+                onPressed: () async {
+                  await Clipboard.setData(
+                    const ClipboardData(text: supportEmail),
+                  );
+                  if (mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Email copied to clipboard'),
+                        backgroundColor: Colors.green,
+                      ),
+                    );
+                  }
+                },
+                icon: const Icon(Icons.copy),
+                label: const Text('Copy Email'),
+              ),
+            ],
+          ),
     );
   }
 
