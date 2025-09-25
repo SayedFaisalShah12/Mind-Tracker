@@ -40,39 +40,55 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return Scaffold(
+      extendBody: true,
       body: IndexedStack(index: _currentIndex, children: _screens),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: FloatingActionButton.extended(
         onPressed: () async {
           await NotificationService.showInstantMoodReminder();
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Mood reminder sent!'),
-              backgroundColor: Colors.green,
+            SnackBar(
+              content: const Text('Mood reminder sent!'),
+              backgroundColor: scheme.inverseSurface,
             ),
           );
         },
-        tooltip: 'Send Mood Reminder',
-        child: const Icon(Icons.notifications_active),
+        label: const Text('Remind Me'),
+        icon: const Icon(Icons.notifications_active),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        currentIndex: _currentIndex,
-        onTap: (index) {
+      floatingActionButtonLocation: FloatingActionButtonLocation.endContained,
+      bottomNavigationBar: NavigationBar(
+        selectedIndex: _currentIndex,
+        onDestinationSelected: (index) {
           setState(() {
             _currentIndex = index;
           });
         },
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.mood), label: 'Mood'),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.check_circle),
+        destinations: const [
+          NavigationDestination(
+            icon: Icon(Icons.home_outlined),
+            selectedIcon: Icon(Icons.home),
+            label: 'Home',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.mood_outlined),
+            selectedIcon: Icon(Icons.mood),
+            label: 'Mood',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.check_circle_outlined),
+            selectedIcon: Icon(Icons.check_circle),
             label: 'Habits',
           ),
-          BottomNavigationBarItem(icon: Icon(Icons.analytics), label: 'Stats'),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
+          NavigationDestination(
+            icon: Icon(Icons.analytics_outlined),
+            selectedIcon: Icon(Icons.analytics),
+            label: 'Stats',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.settings_outlined),
+            selectedIcon: Icon(Icons.settings),
             label: 'Settings',
           ),
         ],
@@ -86,87 +102,100 @@ class HomeTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Mind Tracker'),
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildWelcomeCard(context),
-            const SizedBox(height: 24),
-            _buildQuickActions(context),
-            const SizedBox(height: 24),
-            _buildTodayOverview(context),
-            const SizedBox(height: 24),
-            _buildRecentMoods(context),
-          ],
-        ),
+      appBar: AppBar(title: const Text('Mind Tracker')),
+      body: CustomScrollView(
+        slivers: [
+          SliverToBoxAdapter(
+            child: Container(
+              margin: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
+                gradient: LinearGradient(
+                  colors: [scheme.primaryContainer, scheme.secondaryContainer],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+              ),
+              child: _buildWelcomeCardContent(context),
+            ),
+          ),
+          SliverPadding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            sliver: SliverList.list(
+              children: [
+                const SizedBox(height: 8),
+                _buildQuickActions(context),
+                const SizedBox(height: 24),
+                _buildTodayOverview(context),
+                const SizedBox(height: 24),
+                _buildRecentMoods(context),
+                const SizedBox(height: 24),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
 
-  Widget _buildWelcomeCard(BuildContext context) {
+  Widget _buildWelcomeCardContent(BuildContext context) {
     final now = DateTime.now();
     final greeting = _getGreeting(now.hour);
-
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              greeting,
-              style: Theme.of(
-                context,
-              ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'How are you feeling today?',
-              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-              ),
-            ),
-            const SizedBox(height: 16),
-            BlocBuilder<MoodBloc, MoodState>(
-              builder: (context, state) {
-                if (state is MoodLoaded && state.todayMoodEntry != null) {
-                  return Row(
-                    children: [
-                      Text(
-                        state.todayMoodEntry!.emoji,
-                        style: const TextStyle(fontSize: 32),
-                      ),
-                      const SizedBox(width: 12),
-                      Text(
-                        'Mood: ${state.todayMoodEntry!.moodValue}/5',
-                        style: Theme.of(context).textTheme.bodyLarge,
-                      ),
-                    ],
-                  );
-                } else {
-                  return ElevatedButton.icon(
-                    onPressed: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) => const MoodTrackingScreen(),
-                        ),
-                      );
-                    },
-                    icon: const Icon(Icons.add),
-                    label: const Text('Log Today\'s Mood'),
-                  );
-                }
-              },
-            ),
-          ],
+    final textTheme = Theme.of(context).textTheme;
+    final onContainer = Theme.of(context).colorScheme.onPrimaryContainer;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          greeting,
+          style: textTheme.headlineSmall?.copyWith(
+            fontWeight: FontWeight.w800,
+            color: onContainer,
+          ),
         ),
-      ),
+        const SizedBox(height: 8),
+        Text(
+          'How are you feeling today?',
+          style: textTheme.bodyLarge?.copyWith(
+            color: onContainer.withOpacity(0.9),
+          ),
+        ),
+        const SizedBox(height: 16),
+        BlocBuilder<MoodBloc, MoodState>(
+          builder: (context, state) {
+            if (state is MoodLoaded && state.todayMoodEntry != null) {
+              return Row(
+                children: [
+                  Text(
+                    state.todayMoodEntry!.emoji,
+                    style: const TextStyle(fontSize: 32),
+                  ),
+                  const SizedBox(width: 12),
+                  Text(
+                    'Mood: ${state.todayMoodEntry!.moodValue}/5',
+                    style: textTheme.bodyLarge?.copyWith(color: onContainer),
+                  ),
+                ],
+              );
+            } else {
+              return FilledButton.icon(
+                onPressed: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => const MoodTrackingScreen(),
+                    ),
+                  );
+                },
+                icon: const Icon(Icons.add),
+                label: const Text('Log Today\'s Mood'),
+              );
+            }
+          },
+        ),
+      ],
     );
   }
 
@@ -253,21 +282,31 @@ class HomeTab extends StatelessWidget {
     Color color,
     VoidCallback onTap,
   ) {
+    final scheme = Theme.of(context).colorScheme;
     return Card(
+      elevation: 0,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
-        child: Padding(
+        borderRadius: BorderRadius.circular(16),
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            gradient: LinearGradient(
+              colors: [color.withOpacity(0.12), scheme.surface],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
           padding: const EdgeInsets.all(16),
           child: Column(
             children: [
-              Icon(icon, color: color, size: 32),
-              const SizedBox(height: 8),
+              Icon(icon, color: color, size: 30),
+              const SizedBox(height: 10),
               Text(
                 title,
                 style: Theme.of(
                   context,
-                ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w500),
+                ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
                 textAlign: TextAlign.center,
               ),
             ],
@@ -348,10 +387,20 @@ class HomeTab extends StatelessWidget {
                 ),
               );
             }
-            return const Card(
+            return Card(
               child: Padding(
-                padding: EdgeInsets.all(16),
-                child: Text('Loading habits...'),
+                padding: const EdgeInsets.all(16),
+                child: Row(
+                  children: const [
+                    SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    ),
+                    SizedBox(width: 12),
+                    Text('Loading habits...'),
+                  ],
+                ),
               ),
             );
           },
@@ -389,7 +438,7 @@ class HomeTab extends StatelessWidget {
 
               return Card(
                 child: Padding(
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(8),
                   child: Column(
                     children:
                         recentMoods.map<Widget>((mood) {
@@ -412,10 +461,20 @@ class HomeTab extends StatelessWidget {
                 ),
               );
             }
-            return const Card(
+            return Card(
               child: Padding(
-                padding: EdgeInsets.all(16),
-                child: Text('Loading recent moods...'),
+                padding: const EdgeInsets.all(16),
+                child: Row(
+                  children: const [
+                    SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    ),
+                    SizedBox(width: 12),
+                    Text('Loading recent moods...'),
+                  ],
+                ),
               ),
             );
           },
