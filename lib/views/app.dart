@@ -27,6 +27,7 @@ class _AppState extends State<App> {
     print('First launch complete');
     print('First launch complete');
     print('First launch complete');
+    print('First launch complete');
   }
 
   @override
