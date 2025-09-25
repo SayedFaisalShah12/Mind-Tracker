@@ -26,6 +26,7 @@ class _AppState extends State<App> {
     await prefs.setBool('is_first_launch', false);
     print('First launch complete');
     print('First launch complete');
+    print('First launch complete');
   }
 
   @override
