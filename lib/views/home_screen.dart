@@ -42,9 +42,8 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     return Scaffold(
-      extendBody: true,
       body: IndexedStack(index: _currentIndex, children: _screens),
-      floatingActionButton: FloatingActionButton.extended(
+      floatingActionButton: FloatingActionButton(
         onPressed: () async {
           await NotificationService.showInstantMoodReminder();
           ScaffoldMessenger.of(context).showSnackBar(
@@ -54,41 +53,41 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           );
         },
-        label: const Text('Remind Me'),
-        icon: const Icon(Icons.notifications_active),
+        child: const Icon(Icons.notifications_active),
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endContained,
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: _currentIndex,
-        onDestinationSelected: (index) {
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _currentIndex,
+        onTap: (index) {
           setState(() {
             _currentIndex = index;
           });
         },
-        destinations: const [
-          NavigationDestination(
+        type: BottomNavigationBarType.fixed,
+        items: const [
+          BottomNavigationBarItem(
             icon: Icon(Icons.home_outlined),
-            selectedIcon: Icon(Icons.home),
+            activeIcon: Icon(Icons.home),
             label: 'Home',
           ),
-          NavigationDestination(
+          BottomNavigationBarItem(
             icon: Icon(Icons.mood_outlined),
-            selectedIcon: Icon(Icons.mood),
+            activeIcon: Icon(Icons.mood),
             label: 'Mood',
           ),
-          NavigationDestination(
-            icon: Icon(Icons.check_circle_outlined),
-            selectedIcon: Icon(Icons.check_circle),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.check_circle_outline),
+            activeIcon: Icon(Icons.check_circle),
             label: 'Habits',
           ),
-          NavigationDestination(
+          BottomNavigationBarItem(
             icon: Icon(Icons.analytics_outlined),
-            selectedIcon: Icon(Icons.analytics),
+            activeIcon: Icon(Icons.analytics),
             label: 'Stats',
           ),
-          NavigationDestination(
+          BottomNavigationBarItem(
             icon: Icon(Icons.settings_outlined),
-            selectedIcon: Icon(Icons.settings),
+            activeIcon: Icon(Icons.settings),
             label: 'Settings',
           ),
         ],
