@@ -49,15 +49,6 @@ class _AppState extends State<App> with WidgetsBindingObserver {
     super.didChangeAppLifecycleState(state);
     if (state == AppLifecycleState.resumed) {
       _maybePromptBiometricOnResume();
-      print('App resumed');
-      print('App resumed');
-      print('App resumed');
-      print('App resumed');
-      print('App resumed');
-      print('App resumed');
-      print('App resumed');
-      print('App resumed');
-      print('App resumed');
     }
   }
 
