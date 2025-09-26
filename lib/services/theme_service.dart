@@ -82,7 +82,7 @@ class ThemeService {
     );
 
     return ThemeData(
-      useMaterial3: true,
+      useMaterial3: false,
       colorScheme: scheme,
       // Typography
       textTheme: const TextTheme(
@@ -212,7 +212,7 @@ class ThemeService {
     );
 
     return ThemeData(
-      useMaterial3: true,
+      useMaterial3: false,
       colorScheme: scheme,
       textTheme: const TextTheme(
         headlineLarge: TextStyle(
