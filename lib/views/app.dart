@@ -14,10 +14,13 @@ class App extends StatefulWidget {
   State<App> createState() => _AppState();
 }
 
-class _AppState extends State<App> {
+class _AppState extends State<App> with WidgetsBindingObserver {
+  bool _isLockScreenActive = false;
+
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     if (widget.isFirstLaunch) {
       _markFirstLaunchComplete();
     }
@@ -39,6 +42,44 @@ class _AppState extends State<App> {
       return true;
     }
     return false;
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    if (state == AppLifecycleState.resumed) {
+      _maybePromptBiometricOnResume();
+    }
+  }
+
+  Future<void> _maybePromptBiometricOnResume() async {
+    if (_isLockScreenActive) return;
+    final shouldLock = await _shouldUseBiometricLock();
+    if (!mounted || !shouldLock) return;
+    _isLockScreenActive = true;
+    // Push lock screen; on unlock, pop back to current screen
+    // If the app was on Home, this ensures re-auth without rebuilding the tree
+    await Navigator.of(context).push(
+      MaterialPageRoute(
+        fullscreenDialog: true,
+        builder:
+            (_) => BiometricLockScreen(
+              child: const SizedBox.shrink(),
+              onUnlock: () {
+                if (Navigator.of(context).canPop()) {
+                  Navigator.of(context).pop();
+                }
+              },
+            ),
+      ),
+    );
+    _isLockScreenActive = false;
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
   }
 
   @override
