@@ -1,26 +1,39 @@
 import 'package:local_auth/local_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter/foundation.dart';
+import 'dart:io' show Platform;
 
 class BiometricService {
   static final LocalAuthentication _localAuth = LocalAuthentication();
 
+  static bool _isSupportedPlatform() {
+    if (kIsWeb) return false;
+    try {
+      return Platform.isAndroid || Platform.isIOS || Platform.isMacOS;
+    } catch (_) {
+      return false;
+    }
+  }
+
   static Future<bool> isAvailable() async {
+    if (!_isSupportedPlatform()) return false;
     try {
       final bool isAvailable = await _localAuth.canCheckBiometrics;
       final bool isDeviceSupported = await _localAuth.isDeviceSupported();
       return isAvailable && isDeviceSupported;
     } catch (e) {
-      print('Error checking biometric availability: $e');
+      debugPrint('Error checking biometric availability: $e');
       return false;
     }
   }
 
   static Future<List<BiometricType>> getAvailableBiometrics() async {
+    if (!_isSupportedPlatform()) return <BiometricType>[];
     try {
       return await _localAuth.getAvailableBiometrics();
     } catch (e) {
-      print('Error getting available biometrics: $e');
-      return [];
+      debugPrint('Error getting available biometrics: $e');
+      return <BiometricType>[];
     }
   }
 
@@ -28,6 +41,7 @@ class BiometricService {
     required String reason,
     String? cancelButton,
   }) async {
+    if (!_isSupportedPlatform()) return false;
     try {
       final bool isAvailable = await BiometricService.isAvailable();
       if (!isAvailable) {
@@ -44,7 +58,7 @@ class BiometricService {
 
       return didAuthenticate;
     } catch (e) {
-      print('Error during biometric authentication: $e');
+      debugPrint('Error during biometric authentication: $e');
       return false;
     }
   }
@@ -52,6 +66,7 @@ class BiometricService {
   static Future<bool> authenticateWithBiometrics({
     required String reason,
   }) async {
+    if (!_isSupportedPlatform()) return false;
     try {
       final bool isAvailable = await BiometricService.isAvailable();
       if (!isAvailable) {
@@ -68,7 +83,7 @@ class BiometricService {
 
       return didAuthenticate;
     } catch (e) {
-      print('Error during biometric authentication: $e');
+      debugPrint('Error during biometric authentication: $e');
       return false;
     }
   }
@@ -94,12 +109,15 @@ class BiometricService {
 
   static Future<void> updateLastPromptTime() async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setInt('last_biometric_prompt', DateTime.now().millisecondsSinceEpoch);
+    await prefs.setInt(
+      'last_biometric_prompt',
+      DateTime.now().millisecondsSinceEpoch,
+    );
   }
 
   static Future<String> getBiometricTypeString() async {
+    if (!_isSupportedPlatform()) return 'Biometric';
     final biometrics = await getAvailableBiometrics();
-    
     if (biometrics.contains(BiometricType.face)) {
       return 'Face ID';
     } else if (biometrics.contains(BiometricType.fingerprint)) {
