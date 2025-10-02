@@ -53,6 +53,10 @@ class _AppState extends State<App> with WidgetsBindingObserver {
       print('resumed');
       print('resumed');
       print('resumed');
+      print('resumed');
+      print('resumed');
+      print('resumed');
+      print('resumed');
     }
   }
 
