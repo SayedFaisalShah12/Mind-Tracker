@@ -86,6 +86,7 @@ class _AppState extends State<App> with WidgetsBindingObserver {
     print('disposed');
     print('disposed');
     print('disposed');
+    print('disposed');
   }
 
   @override
