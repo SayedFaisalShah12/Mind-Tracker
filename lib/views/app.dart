@@ -81,6 +81,7 @@ class _AppState extends State<App> with WidgetsBindingObserver {
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
     print('disposed');
+    print('disposed');
   }
 
   @override
