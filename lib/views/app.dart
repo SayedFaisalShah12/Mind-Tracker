@@ -51,6 +51,7 @@ class _AppState extends State<App> with WidgetsBindingObserver {
       _maybePromptBiometricOnResume();
       print('resumed');
       print('resumed');
+      print('resumed');
     }
   }
 
